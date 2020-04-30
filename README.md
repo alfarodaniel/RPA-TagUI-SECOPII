@@ -5,7 +5,6 @@ A partir de una herramienta <b>Open Source</b> (Código Abierto) de&nbsp;<b>RPA<
 Logros</h3>
 <div>
 <ul>
-<li></li>
 <li>Cumplimiento de las Directrices Legales que en materia de contratación rigen y obligan a la empresa en el uso de la plataforma del SECOP II a partir del 1 de enero de 2020</li>
 <li>Reducción de los tiempos para la elaboracion y publicacion del contrato (de 30 minutos a &lt; 3 minutos) y sus modificaciones contractuales (de 15 minutos a &lt; 2.5. minutos).&nbsp;</li>
 <li>Minimiza los errores en la digitación de la información, mejorando la calidad de la misma.</li>
