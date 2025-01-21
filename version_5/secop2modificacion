@@ -1,0 +1,388 @@
+// cargar datos
+load Base_de_datos_Contratacion.csv to lista
+array_lista = lista.split('\n')
+
+// iniciar variables
+ask usuario?
+usuario = ask_result
+ask contraseña?
+pass = ask_result
+espera = 10
+enlace = 0
+
+// accceder página
+https://community.secop.gov.co/STS/Users/Login/Index?SkinName=CCE
+wait 5
+type txtUserName as '+usuario+'
+type txtPassword as '+pass+'
+click btnLoginButton
+for (n = 1; n < espera; n++) 
+{
+  if present('//*[@id="seldpCompany"]/*[@value="702729500"]')
+  {
+    break
+  }
+  wait 5
+}
+select seldpCompany as 701234567
+wait 2
+click btnButton1
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('btnAcknowledgeGen')
+  {
+    break
+  }
+  if present('//*[@value="Procesos"]')
+  {
+    break
+  }
+}
+
+// mensaje informativo
+if present('btnAcknowledgeGen')
+{
+  click btnAcknowledgeGen
+  wait 5
+}
+
+//for (x = 1; x < 2; x++) 
+for (x = 1; x < array_lista.length; x++) 
+{
+  items = array_lista[x].split('|')
+  numproceso = items[0]
+  codigo_rubro = items[9]
+  fecha_final = items[18]
+  valor_total = items[19]
+  clase1 = items[20]
+  adicion1 =  items[24]
+  cdp1 = items[27]
+  crp1 = items[29]
+  clase2 = items[31]
+  adicion2 =  items[35]
+  cdp2 = items[38]
+  crp2 = items[40]
+  clase3 = items[42]
+  adicion3 =  items[46]
+  cdp3 = items[49]
+  crp3 = items[51]
+  echo "------------------------------------ inicio proceso " numproceso	
+
+// aprobar proceso
+for (n = 1; n < espera; n++) 
+{
+  if present('//*[@value="Procesos"]')
+  {
+    break
+  }
+  wait 5
+}
+click //*[@value="Procesos"]
+click lnkSubItem6
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('txtSimpleSearchInput')
+  {
+    break
+  }
+}
+type txtSimpleSearchInput as CPS-'+numproceso+'-2019[enter]
+wait 5
+click //*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]
+vision type(Key.UP)
+vision type(Key.ENTER)
+wait 5
+click //*[@title="CPS-'+numproceso+'-2019"]
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('incBuyerDossierDetaillnkBuyerDossierDetailLink')
+  {
+    break
+  }
+  click //*[@title="CPS-'+numproceso+'-2019"]
+}
+click lnkProcurementContractViewLink_0
+
+// 1 modificacion del contrato
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_1"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_2
+}
+click btnMakeModification
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('lnkModifyContractGeneralLink')
+  {
+    break
+  }
+}
+click lnkModifyContractGeneralLink
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  frame ProcurementContractModificationConfirmCreateTypeModal_iframe
+  {
+    if present('btnConfirmGen')
+    {
+      break
+    }
+  }
+}
+frame ProcurementContractModificationConfirmCreateTypeModal_iframe
+{
+  type btnConfirmGen as ""
+  vision type(Key.SPACE)  
+}
+wait 5
+
+// 2 informacion general
+click stepCircle_2
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_2"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_2
+}
+type dtmbContractEnd_txt as [clear]'+fecha_final+'" 23:59"
+
+// 3 condiciones
+click stepCircle_3
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_3"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_3
+}
+type dtmbDeliverEndDateGen_txt as [clear]'+fecha_final+'" 23:59"
+type dtmbContractRenewalDateGen_txt as [clear]'+fecha_final+'" 23:59"
+
+// 4 bienes y servicios
+click stepCircle_4
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_4
+}
+wait 5
+click //*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[2]/td[4]
+wait 2
+dclick //*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input
+type //*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input as '+valor_total+'
+
+// 7 informacion presupuestal
+click stepCircle_7
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_7
+}
+
+for (clasen = 1; clasen <= 3; clasen++)
+{
+
+  if (clasen == 1)
+  {
+    clase = clase1
+    adicion = adicion1
+    cdp = cdp1
+    crp = crp1
+  }
+  if (clasen == 2)
+  {
+    clase = clase2
+    adicion = adicion2
+    cdp = cdp2
+    crp = crp2
+  }
+  if (clasen == 3)
+  {
+    clase = clase3
+    adicion = adicion3
+    cdp = cdp3
+    crp = crp3
+  }
+
+if ((clase == "adicion") || (clase == "adicion y prorroga"))
+{
+click btnAddCode
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  frame SIIFModal_iframe
+  {
+    if present('rdbgOptionsToSelectRadioButton_0')
+    {
+      break
+    }
+  }
+}
+frame SIIFModal_iframe
+{
+  type rdbgOptionsToSelectRadioButton_0 as ""
+  vision type(Key.SPACE)
+  wait 5
+  type txtSIIFIntegrationItemTextbox as '+cdp+'
+  type cbxSIIFIntegrationItemUsedValueTextbox as '+adicion+'
+  type txtSIIFIntegrationItemPCICodebox as '+codigo_rubro+'
+  type btnSIIFIntegrationItemButton as ""
+  vision type(Key.SPACE)
+}
+wait 10
+click btnCommitmentAddCode
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  frame SIIFModal_iframe
+  {
+    if present('rdbgOptionsToSelectRadioButton_0')
+    {
+      break
+    }
+  }
+}
+frame SIIFModal_iframe
+{
+  type rdbgOptionsToSelectRadioButton_0 as ""
+  vision type(Key.SPACE)
+  wait 5
+  type txtSIIFCommitmentIntegrationItemTextbox as '+crp+'
+  type cbxSIIFCommitmentIntegrationItemBalanceTextbox as '+adicion+'
+  type selRelatedBudgetValue as ""
+  vision type(Key.SPACE)
+  vision_step('cdp = "' + cdp + '"')
+  vision type(cdp)
+  vision type(Key.ENTER)
+  type btnSIIFCommitmentIntegrationItemButton as ""
+  vision type(Key.SPACE)
+}
+wait 10
+}
+
+}
+
+
+// 1 modificacion del contrato
+click stepCircle_1
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('//*[@id="stepCircleSelected_1"][@class="MainColor4 circle22 Black stepOn"]')
+  {
+    break
+  }
+  click stepCircle_1
+}
+
+for (clasen = 1; clasen <= 3; clasen++)
+{
+
+  if (clasen == 1)
+  {
+    clase = clase1
+    adicion = adicion1
+    cdp = cdp1
+    crp = crp1
+  }
+  if (clasen == 2)
+  {
+    clase = clase2
+    adicion = adicion2
+    cdp = cdp2
+    crp = crp2
+  }
+  if (clasen == 3)
+  {
+    clase = clase3
+    adicion = adicion3
+    cdp = cdp3
+    crp = crp3
+  }
+
+if (clase != "")
+{
+click cmAttachmentsOptions
+vision type(Key.TAB)
+vision type(Key.ENTER)
+popup DocumentAlternateUpload
+{
+  click divAddFilesButton
+  vision_step('numproceso = "' + numproceso + '"')
+  vision_step('clasen = "' + clasen + '"')
+  vision type("C:\\secop2\\documentos\\OTROSI-" + clasen + "-CPS-" + numproceso + "-2019.pdf")
+  vision type(Key.ENTER)
+  wait 5
+  click btnUploadFilesButtonBottom
+  for (n = 1; n < espera; n++) 
+  {
+    wait 5
+    if present('//*[@id="tblFilesTable"]//*[@processed="success"]')
+    {
+      break
+    }
+  }
+  click btnCancelBottomButtom
+}
+wait 10
+}
+
+}
+type txaModificationPurpose as modificacion
+
+// finalizar modificacion
+click btnOption_tbContractToolbar_Finish
+wait 5
+type chkCheckBoxAgreeTerms as ""
+vision type(Key.SPACE)
+wait 5
+type btnContractTotalValueValidationConfirmDialogModal as ""
+vision type(Key.SPACE)
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  frame StartApprovalSupportModal_iframe
+  {
+    if present('btnConfirmGen')
+    {
+      break
+    }
+  }
+}
+frame StartApprovalSupportModal_iframe
+{
+  type btnConfirmGen as ""
+  vision type(Key.SPACE)
+}
+for (n = 1; n < espera; n++) 
+{
+  wait 5
+  if present('IncTaskApproval_spnThisDocumentIsWaitingForAWorkfGen')
+  {
+    break
+  }
+}
+
+}
+wait 60

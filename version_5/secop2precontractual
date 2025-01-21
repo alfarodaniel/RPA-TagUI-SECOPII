@@ -1,0 +1,383 @@
+// cargar datos
+load Base_de_datos_Contratacion.csv to lista
+array_lista = lista.split('\n')
+
+// iniciar variables
+ask usuario?
+usuario = ask_result
+ask contraseña?
+pass = ask_result
+espera = 10
+
+// accceder página
+https://community.secop.gov.co/STS/Users/Login/Index?SkinName=CCE
+wait 5
+type txtUserName as '+usuario+'
+type txtPassword as '+pass+'
+click btnLoginButton
+for (n = 1; n < espera; n++)
+{
+  if present('//*[@id="seldpCompany"]/*[@value="702729500"]')
+  {
+    break
+  }
+  wait 5
+}
+
+select seldpCompany as 702729500
+wait 2
+click btnButton1
+for (n = 1; n < espera; n++)
+{
+  wait 5
+  if present('btnAcknowledgeGen')
+  {
+    break
+  }
+  if present('//*[@value="Procesos"]')
+  {
+    break
+  }
+}
+
+// mensaje informativo
+if present('btnAcknowledgeGen')
+{
+  click btnAcknowledgeGen
+  wait 5
+}
+
+//for (x = 1; x < 2; x++) 
+for (x = 1; x < array_lista.length; x++)
+{
+  items = array_lista[x].split('|')
+  numproceso = items[0]
+  descripcion = items[3]
+  valor_contrato = items[4]
+  cdp = items[5]
+  valor_cdp = items[7]
+  nombre_rubro = items[8]
+  codigo_rubro = items[9]
+  dias = items[13]
+  fecha_inicio = items[14]
+  fecha_terminacion = items[15]
+  meses = items[16]
+  porcentaje_contrato = items[20]
+  fecha_desde_poliza = items[21]
+  fecha_hasta_poliza = items[22]
+  echo "------------------------------------ inicio proceso " numproceso
+
+  // crear proceso
+  for (n = 1; n < espera; n++)
+  {
+    if present('//*[@value="Procesos"]')
+    {
+      break
+    }
+    wait 5
+  }
+  click //*[@value="Procesos"]
+  click lnkSubItem9
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('btnCreateProcedureButton10')
+    {
+      break
+    }
+  }
+  click btnCreateProcedureButton10
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    frame CreateProcedure_iframe
+    {
+      if present('txtProcedureReference')
+      {
+        break
+      }
+    }
+  }
+  frame CreateProcedure_iframe
+  {
+    type txtProcedureReference as CPS - '+numproceso+' - 2019
+    type txtProcedureName as APOYO A LA GESTION
+    type txtBusinessOperationText as DIRECCI\xD3N DE CONTRATACI\xD3N
+    vision type(" - COMPRAS")
+    wait 2
+    vision type(Key.DOWN)
+    vision type(Key.ENTER)
+    type btnSaveCurrentDossierTop as [enter]
+  }
+
+  // proceso informacion general
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('txaDossierDescription')
+    {
+      break
+    }
+  }
+  type txaDossierDescription as '+descripcion+'
+
+  // codigo UNSPSC
+  click divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText
+  vision type("85101600")
+  wait 2
+  vision type(Key.DOWN)
+  vision type(Key.ENTER)
+  wait 2
+
+  // adquisición del PAA
+  type btnAddAcquisitionButton as ""
+  vision type(Key.ENTER)
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    frame wndSearchPlannedAcquisitions_iframe
+    {
+      if present('txtSearchAcquisitionTXT')
+      {
+        break
+      }
+    }
+  }
+  frame wndSearchPlannedAcquisitions_iframe
+  {
+    if (nombre_rubro == "Remuneración Servicios Técnicos")
+	{
+      type chkGridAcqCheckBox_0 as ""
+      vision type(Key.SPACE)
+    }
+    if (nombre_rubro == "Honorarios")
+	{
+      type chkGridAcqCheckBox_1 as ""
+      vision type(Key.SPACE)
+    }
+    if (nombre_rubro == "Contratacion Servicios Asistenciales Generales")
+	{
+      type chkGridAcqCheckBox_2 as ""
+      vision type(Key.SPACE)
+    }
+    if (nombre_rubro == "Contratacion Servicios Asistenciales PIC")
+	{
+      type chkGridAcqCheckBox_3 as ""
+      vision type(Key.SPACE)
+    }
+    wait 2
+    type btnConfirmAcquisitionsSelection as ""
+    vision type(Key.ENTER)
+  }
+  wait 5
+
+  // informacion del contrato
+  select selTypeOfContractSelect as DecreeLaw092 / 2017
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('selJustificationTypeOfContractSelected')
+    {
+      break
+    }
+  }
+  select selJustificationTypeOfContractSelected as Decree092 / 2017
+  if (dias == 0)
+  {
+    type nbxDurationGen as '+meses+'
+    select selDurationTypeP2Gen as 2
+  }
+  else
+  {
+    type nbxDurationGen as '+dias+'
+  }
+
+  // guardar información general
+  wait 5
+  click btnSaveProcedureTop
+  wait 5
+  click btnApproveDossier
+
+  // cronograma
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('//*[@id="stepDiv_2"][@class="LeftMenuButtonOn Black"]')
+    {
+      break
+    }
+  }
+  type dtmbContractSignatureDate_txt as '+fecha_inicio+'" 00:00"
+  type dtmbStartDateExecutionOfContract_txt as '+fecha_inicio+'" 00:00"
+  type dtmbExecutionOfContractTerm_txt as '+fecha_terminacion+'" 23:59"
+  click body
+
+  // Configuración financiera
+  if (porcentaje_contrato == "10")
+  {
+    click rdbgWarrantiesField_0
+    wait 5
+    click chkComplianceContractCB
+    wait 5
+    type nbxComplianceContractPercentageField as '+porcentaje_contrato+'
+    type dtmbComplianceContractStartDateBox_txt as '+fecha_desde_poliza+'" 00:00"
+    type dtmbComplianceContractEndDateBox_txt as '+fecha_hasta_poliza+'" 23:59"
+    click rdbgCivilLiabilityField_1
+  }
+  if (porcentaje_contrato == "0")
+  {
+    click rdbgWarrantiesField_0
+    wait 5
+    click rdbgComplianceField_1
+    wait 5
+    type cbxCivilLiabilityValueField as '+porcentaje_contrato+'
+  }
+  wait 5
+
+  // precios
+  type cbxBasePrice as '+valor_contrato+'
+  click body
+  wait 10
+
+  // informacion presupuestal
+  click rdbgFrameworkAgreementValue_1
+  //wait 5
+  select selExpenseTypeSelect as 0
+  select selBudgetOriginSelect as 0
+  wait 2
+  type btnAddCode as ""
+  vision type(Key.ENTER)
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    frame SIIFModal_iframe
+    {
+      if present('rdbgOptionsToSelectRadioButton_0')
+      {
+        break
+      }
+    }
+  }
+  frame SIIFModal_iframe
+  {
+    type rdbgOptionsToSelectRadioButton_0 as ""
+    vision type(Key.SPACE)
+    wait 5
+    type txtSIIFIntegrationItemTextbox as '+cdp+'
+    type cbxSIIFIntegrationItemBalanceTextbox as '+valor_cdp+'
+    type cbxSIIFIntegrationItemUsedValueTextbox as '+valor_contrato+'
+    type txtSIIFIntegrationItemPCICodebox as '+codigo_rubro+'
+    type btnSIIFIntegrationItemButton as ""
+    vision type(Key.ENTER)
+  }
+  wait 5
+
+  // guardar configuración
+  click btnSaveProcedureTop
+
+  // 3 cuestionario
+  click stepCircle_3
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('//*[@id="stepDiv_3"][@class="LeftMenuButtonOn Black"]')
+    {
+      break
+    }
+    click stepCircle_3
+  }
+  wait 5
+  click //*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[3]/td[4]
+  wait 2
+
+  // codigo UNSPSC
+  click //*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input[1]
+  vision type("85101600")
+  wait 2
+  vision type(Key.DOWN)
+  vision type(Key.ENTER)
+  wait 2
+  type //*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[3]/input as '+descripcion+'
+  type //*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input as 1
+  type //*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input as '+valor_contrato+'
+
+  // guardar cuestionario
+  click btnSaveProcedureTop
+  //wait 5
+
+  // 4 documentos del proceso
+  click stepCircle_4
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('//*[@id="stepDiv_4"][@class="LeftMenuButtonOn Black"]')
+    {
+      break
+    }
+    click stepCircle_4
+  }
+
+  // comentario
+  wait 5
+  type incContractDocumentstxaExternalCommentsGen as Se anexa requerimiento segun necesidad de la institucion
+
+  //anexar documento
+  click incContractDocumentsbtnUploadDocumentGen
+  wait 5
+  popup OnDocumentsUploaded
+  {
+    click divAddFilesButton
+    vision_step('numproceso = "' + numproceso + '"')
+    vision type("C:\\secop2\\documentos\\req-" + numproceso + "-2019.pdf")
+    //  vision type(Key.TAB)
+    //  vision type(Key.TAB)
+    vision type(Key.ENTER)
+    wait 5
+    click btnUploadFilesButtonBottom
+    for (n = 1; n < espera; n++)
+	{
+      wait 5
+      if present('//*[@id="tblFilesTable"]//*[@processed="success"]')
+      {
+        break
+      }
+    }
+    click btnCancelBottomButtom
+  }
+  wait 10
+
+  // guardar documentos del proceso
+  click btnSaveProcedureTop
+  wait 5
+
+  // publicar
+  click btnOption_trRowToolbarTop_tdCell1_tbToolBar_Finish
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    frame StartApprovalSupportModal_iframe
+    {
+      if present('btnConfirmGen')
+      {
+        break
+      }
+    }
+  }
+  frame StartApprovalSupportModal_iframe
+  {
+    type btnConfirmGen as ""
+    vision type(Key.ENTER)
+  }
+  for (n = 1; n < espera; n++)
+  {
+    wait 5
+    if present('IncTaskApproval_spnWorkflowTasksGen_0')
+    {
+      break
+    }
+  }
+
+}
+click userImage
+click logOut
+wait 30
