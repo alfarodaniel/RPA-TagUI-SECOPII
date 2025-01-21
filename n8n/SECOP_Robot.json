@@ -1,0 +1,185 @@
+{
+  "name": "SECOP Robot",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const stdout = items[0].json.stdout;  // Obtener el JSON desde stdout\nconst parsedData = JSON.parse(stdout);  // Parsear la cadena JSON\n\n// Establecer el resultado como una tabla\nreturn parsedData.map(item => {\n  return {\n    json: item  // Cada elemento del array es una fila de la tabla\n  };\n});\n"
+      },
+      "id": "c1154551-6f94-4292-8cd2-0b3fa4fab573",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "command": "sqlite3 C:/secop2/base.db \".mode json\" \"SELECT * FROM Datos WHERE estado = 'pendiente' LIMIT 1;\"\n"
+      },
+      "id": "e1e9bf12-2ea3-45b8-ae1b-fe2747d709ae",
+      "name": "Execute Command sqlite select",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26013ad9-fe91-421c-9792-dc7f514f61c0",
+              "name": "estado",
+              "value": "={{ $('Execute Command sqlite select').item.json.stdout }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f27d7608-43b3-4046-a7d0-1cfc1249c8e5",
+      "name": "Edit Fields estado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        540,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Robot\n1. Llamar a la API solicitando una fila\n2. Convertir la fila de json a csv\n3. Ejecutar el robot\n4. Llamar a la API informando que se completó la tarea",
+        "height": 140,
+        "width": 436
+      },
+      "id": "2f1d7994-2559-4743-8f0a-e809bd3ef977",
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -260,
+        -20
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "command": "=sqlite3 C:/secop2/base.db \"UPDATE Datos SET estado = 'ejecutando', fechaHoraInicial = '{{ $now.format('yyyy-LLL-dd tt')}}' WHERE NUMERO = '{{ $json.NUMERO }}';\"\n"
+      },
+      "id": "f02c98fc-ca03-4653-ac73-1d4a26e6b5b1",
+      "name": "Execute Command sqlite update",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        340,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "ed4e492d-5a9e-4bf1-8854-81238910df2e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -260,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://wp-demo.mondo.surf/wp-json/wp/v2/media",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "attachment; filename=\"example.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "639fc837-f4c8-4aee-b556-9c8316f02f98",
+      "name": "Upload media",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -120,
+        400
+      ],
+      "typeVersion": 4.1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Command sqlite update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command sqlite select": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command sqlite update": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Command sqlite select",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3034a5c-3676-411c-aa3e-60e7f5da7890",
+  "meta": {
+    "instanceId": "53ec9d548d8552c78664c460ff591d05f5983628209982c2b147e0b48c4a6d5d"
+  },
+  "id": "XoaMjdrNUrjP62Qe",
+  "tags": []
+}

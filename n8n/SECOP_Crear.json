@@ -1,0 +1,249 @@
+{
+  "name": "SECOP Crear",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "fddfdc6c-92b7-4e10-81a7-67f336edba82",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        420,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:/secop2/base.xlsx",
+        "options": {}
+      },
+      "id": "edde62d9-c002-474b-b214-11c3617ee727",
+      "name": "Read Files from Disk xlsx",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26013ad9-fe91-421c-9792-dc7f514f61c0",
+              "name": "estado",
+              "value": "pendiente",
+              "type": "string"
+            },
+            {
+              "id": "e600d588-6809-4424-8fbd-72bbf6ea6c62",
+              "name": "fechaHoraInicial",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "123a4024-be40-4e18-8414-660cc0a5dadd",
+              "name": "fechaHoraFinal",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "d99814c5-b6ac-4462-83ec-3f8047919f1b",
+      "name": "Edit Fields add columns",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e49bb94a-68ec-4b94-b876-f24d5d43166a",
+      "name": "Convert to File csv",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        20,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{$env.HOMEDRIVE}}{{$env.HOMEPATH}}\\Documents\\robots\\datos\\base.csv",
+        "options": {}
+      },
+      "id": "949c5590-f4bf-42c9-93f0-ec643a02ef7b",
+      "name": "Write Files from Disk csv",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=sqlite3 {{$env.HOMEDRIVE}}{{$env.HOMEPATH}}\\Documents\\robots\\datos\\base.db \"DROP TABLE IF EXISTS Datos;\" \".mode csv\" \".import {{$env.HOMEDRIVE}}{{$env.HOMEPATH}}\\Documents\\robots\\datos\\base.csv Datos\"\n"
+      },
+      "id": "efc102ee-895b-4445-98c4-324dc45e2d98",
+      "name": "Execute Command sqlite",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        420,
+        380
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "15be5f1e-77a7-4b3e-9a8a-fe19fc9ffefe",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        20,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26013ad9-fe91-421c-9792-dc7f514f61c0",
+              "name": "estado",
+              "value": "Proceso 'crear' realizado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1819bad7-5e45-4b72-8538-b2e1b94eaf14",
+      "name": "Edit Fields estado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Crear\n1. Carga xlsx\n2. Agregar columnas\n3. Convertir xlsx a csv\n4. Crear base de datos sqlite con el csv",
+        "height": 140,
+        "width": 300
+      },
+      "id": "36368766-7132-4099-a0da-864cf8c9a628",
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields add columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Files from Disk xlsx": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields add columns": {
+      "main": [
+        [
+          {
+            "node": "Convert to File csv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File csv": {
+      "main": [
+        [
+          {
+            "node": "Write Files from Disk csv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Files from Disk csv": {
+      "main": [
+        [
+          {
+            "node": "Execute Command sqlite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command sqlite": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Files from Disk xlsx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70c5c662-bb56-4b86-b29a-b6049b69d3db",
+  "meta": {
+    "instanceId": "53ec9d548d8552c78664c460ff591d05f5983628209982c2b147e0b48c4a6d5d"
+  },
+  "id": "TtAA1FtFUh6UQqWC",
+  "tags": []
+}

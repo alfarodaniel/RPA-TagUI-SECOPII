@@ -1,0 +1,150 @@
+{
+  "name": "SECOP Ejecutar",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const stdout = items[0].json.stdout;  // Obtener el JSON desde stdout\nconst parsedData = JSON.parse(stdout);  // Parsear la cadena JSON\n\n// Establecer el resultado como una tabla\nreturn parsedData.map(item => {\n  return {\n    json: item  // Cada elemento del array es una fila de la tabla\n  };\n});\n"
+      },
+      "id": "3a2ccbfb-6ac0-423d-a328-d248b8eba630",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "command": "sqlite3 C:/secop2/base.db \".mode json\" \"SELECT * FROM Datos WHERE estado = 'pendiente' LIMIT 1;\"\n"
+      },
+      "id": "9d57ef12-508e-4e55-b37d-224a17eec043",
+      "name": "Execute Command sqlite select",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26013ad9-fe91-421c-9792-dc7f514f61c0",
+              "name": "estado",
+              "value": "={{ $('Execute Command sqlite select').item.json.stdout }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "72d74b5c-4fc8-4ab6-a0af-a9175582cd3e",
+      "name": "Edit Fields estado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        -20
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "18e844d4-bc79-491e-9d6b-26ba985b52dd",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Ejecutar\n1. Seleccionar de sqlite la primera fila en estado pendiente\n2. Cambiar el estado a ejecutando\n3. Enviar la fila en json",
+        "height": 122,
+        "width": 436
+      },
+      "id": "b1087528-111a-4ca9-81e6-254c106f4905",
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -520,
+        -180
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "command": "=sqlite3 C:/secop2/base.db \"UPDATE Datos SET estado = 'ejecutando', fechaHoraInicial = '{{ $now.format('yyyy-LLL-dd tt')}}' WHERE NUMERO = '{{ $json.NUMERO }}';\"\n"
+      },
+      "id": "f38c812b-2b68-4d59-93c8-8b7debd8bb66",
+      "name": "Execute Command sqlite update",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -20
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Command sqlite update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command sqlite select": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Command sqlite select",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command sqlite update": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c411e35c-2be9-44bb-9008-8fc8f9e921a7",
+  "meta": {
+    "instanceId": "53ec9d548d8552c78664c460ff591d05f5983628209982c2b147e0b48c4a6d5d"
+  },
+  "id": "8OK1aWgz5Fds2BBV",
+  "tags": []
+}
