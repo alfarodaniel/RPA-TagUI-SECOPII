@@ -8,12 +8,10 @@ import sqlite3
 # Leer el archivo 'parametros.csv'
 df = pd.read_csv('parametros.csv', header=None)
 
-# Convertir el DataFrame en un diccionario
+# Convertir el DataFrame en un diccionario params
 params = dict(zip(df[0], df[1]))
 
-# Imprimir el diccionario
-print(params)
-# Leer el archivo base en un DataFrame con todas las columnas como texto
+# Leer el archivo con el nombre definido en base de params en un DataFrame con todas las columnas como texto
 dfbase = pd.read_excel(params.get('base') + '.xlsx', dtype=str)
 
 # Guardar el DataFrame en formato Parquet
