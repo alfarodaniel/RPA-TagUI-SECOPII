@@ -1,24 +1,29 @@
 import pandas as pd
 import sqlite3
 
-# Leer el archivo CSV de parámetros
-dfparams = pd.read_csv('parametros.csv')
+#import os
+#os.chdir("C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\orquestador")
+#print("Directorio actual:", os.getcwd())
 
-# Leer el archivo CSV de parámetros y guardarlo en un diccionario
-parametros_dict = dict(zip(dfparams.iloc[:, 0], dfparams.iloc[:, 1]))
+# Leer el archivo 'parametros.csv'
+df = pd.read_csv('parametros.csv', header=None)
 
-# Leer el archivo XLSX
-df = pd.read_excel('archivo.xlsx')
+# Convertir el DataFrame en un diccionario
+params = dict(zip(df[0], df[1]))
+
+# Imprimir el diccionario
+print(params)
+# Leer el archivo base en un DataFrame con todas las columnas como texto
+dfbase = pd.read_excel(params.get('base') + '.xlsx', dtype=str)
 
 # Guardar el DataFrame en formato Parquet
-#df.to_parquet('archivo.parquet')
+#dfbase.to_parquet('archivo.parquet')
 
 # Conectar a la base de datos SQLite (o crearla si no existe)
 conn = sqlite3.connect('base.db')
 
 # Guardar el DataFrame en la base de datos SQLite
-df.to_sql('tabla', conn, if_exists='replace', index=False)
+dfbase.to_sql('tabla', conn, if_exists='replace', index=False)
 
 # Cerrar la conexión
 conn.close()
-
