@@ -43,18 +43,54 @@ respositorio_base = repositorio + 'orquestador\\base.db'
 robot_base = robot + '\\' + base + '.csv'
 robot_exe = robot + '\\' + robot + '.exe'
 
-while continuar:
+# Función consultar para leer la base de datos SQLite
+def consultar(caso):
+    # Variables
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
     # Conectar a la base de datos SQLite
     conn = sqlite3.connect(respositorio_base)
 
+    if caso == 'select1':
+        # Leer el primer registro con la columna 'usuario' igual a ''
+        query = "SELECT * FROM base WHERE usuario = '' LIMIT 1"
+        result = pd.read_sql_query(query, conn)
+    
+    else:
+
+        if caso == 'update1':
+            # Actualizar el valor de la columna 'usuario' a 'usuario' y 'robot_inicio' con la fecha y hora actual
+            update_query = """
+            UPDATE base
+            SET usuario = '{}', robot_inicio = ?
+            WHERE usuario = '' AND {} = ?
+            """.format(usuario,llave)
+            result = None
+
+        elif caso == 'update2':
+            # Actualizar el valor de la columna 'robot_fin' con la fecha y hora actual
+            update_query = """
+            UPDATE base
+            SET robot_fin = ?
+            WHERE {} = ?
+            """.format(llave)
+            result = None
+        
+        # Guardar los cambios
+        conn.execute(update_query, (current_time, df_result[llave][0]))
+        conn.commit()
+
+    # Cerrar la conexión
+    conn.close()
+    return result
+
+while continuar:
     # Leer el primer registro con la columna 'usuario' igual a ''
-    query = "SELECT * FROM base WHERE usuario = '' LIMIT 1"
-    df_result = pd.read_sql_query(query, conn)
+    df_result = consultar('select1')
 
     # Verificar si hay registros que cumplan la condición
     if df_result.empty:
         print('no hay más registros')
-        conn.close()
         continuar = False
     else:
         # Imprimir el valor de la primera columna
@@ -64,17 +100,7 @@ while continuar:
         df_result.to_csv(robot_base, index=False)
 
         # Actualizar el valor de la columna 'usuario' a 'usuario' y 'robot_inicio' con la fecha y hora actual
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        update_query = """
-        UPDATE base
-        SET usuario = '{}', robot_inicio = ?
-        WHERE usuario = '' AND {} = ?
-        """.format(usuario,llave)
-        conn.execute(update_query, (current_time, df_result[llave][0]))
-        conn.commit()
-
-        # Cerrar la conexión
-        conn.close()
+        consultar('update1')
 
         # Ejecutar robot y esperar a que termine
         print('Ejecutando comprobador.exe')
@@ -89,18 +115,5 @@ while continuar:
 
         # Verificar si no hubo errores
         if result.stderr == '':
-            # Conectar a la base de datos SQLite
-            conn = sqlite3.connect(respositorio_base)
-
             # Actualizar el valor de la columna 'robot_fin' con la fecha y hora actual
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            update_query = """
-            UPDATE base
-            SET robot_fin = ?
-            WHERE {} = ?
-            """.format(llave)
-            conn.execute(update_query, (current_time, df_result[llave][0]))
-            conn.commit()
-
-            # Cerrar la conexión
-            conn.close()
+            consultar('update2')
