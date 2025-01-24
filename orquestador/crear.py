@@ -15,7 +15,7 @@ params = dict(zip(df['parametro'], df['valor']))
 # Leer el archivo con el nombre definido en base de params en un DataFrame con todas las columnas como texto
 print('Cargnando archivo base en formato Excel')
 df = pd.read_excel(params.get('base') + '.xlsx', dtype=str)
-# Agregar las columnas de seguimiento 'usuario', 'fecha_inicio' y 'fecha_fin' con valores vacíos
+# Agregar las columnas de seguimiento 'usuario', 'robot_inicio' y 'robot_fin' con valores vacíos
 df[['usuario', 'robot_inicio', 'robot_fin']] = '', '', ''
 #df.to_parquet('archivo.parquet')
 

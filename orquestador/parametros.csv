@@ -1,2 +1,5 @@
 parametro,valor,descripción
-base,Base_de_datos_Contratacion,nombre del archivo de base de datos sin extensión .xlsx
+robot,comprobador,nombre del robot a ejecutar que debe ser igual al nombre de la carpeta
+usuario,robot1,nombre del usuario desde el que se está ejecutando el robot
+base,comprobar,nombre del archivo de base de datos sin extensión .xlsx
+llave,PacienteNit,nombre de la columna definida como llave primaria (no debe tener duplicados)
