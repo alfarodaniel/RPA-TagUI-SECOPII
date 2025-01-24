@@ -1,4 +1,5 @@
 parametro,valor,descripción
+repositorio,C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\,ubicación del repositorio de documentos
 robot,comprobador,nombre del robot a ejecutar que debe ser igual al nombre de la carpeta
 usuario,robot1,nombre del usuario desde el que se está ejecutando el robot
 base,comprobar,nombre del archivo de base de datos sin extensión .xlsx

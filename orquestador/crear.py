@@ -6,7 +6,7 @@ import sqlite3
 #print("Directorio actual:", os.getcwd())
 
 # Leer el archivo 'parametros.csv'
-print('Cargnando parametros.csv')
+print('Cargando parametros.csv')
 df = pd.read_csv('parametros.csv')
 
 # Convertir el DataFrame en un diccionario params
