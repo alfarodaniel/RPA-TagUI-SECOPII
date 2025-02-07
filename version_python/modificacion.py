@@ -409,302 +409,150 @@ for i in range(0, len(dfbase)):
                 r.frame()
 
                 # Terminar Edición del Contrato
-                if not terminar_edicion_contrato(i, proceso): continue
+                terminar_edicion_contrato(i, proceso)
+                continue
 
+            print('--- Modificacion ---')
+            if r.present('//*[@id="msgMessagesPanel"]/tbody/tr'):
+                # Paso 8: ??????
+                print('Paso 8: ????????')
+                print('--- 8 ?????? --- proceso', proceso)
+                r.click('stepCircle_8') # Modificacion del Contrato
+                if not esperar('//*[@id="stepCircleSelected_8"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_8'): continue
+                print('--- Evalua En Edicion---')
+                if r.present('En edici'): # ??????
+                    r.wait(2)
+                    modificacion = r.read('//*[@id="spnModificationStatusValue_0"]') # ??????
+                    r.write(proceso + ',' + modificacion, 'modificacion.csv')
+                    r.click('//*[@id="lnkEditLink_0"]')
+                    r.wait(25)
+                    if r.present('//*[@id="stepDiv_2"]/div[3]'): # ??????
+                        r.click('lnkModifyContractGeneralLink') # ??????
+                        
+                        # Frame TIPO DE MODIFICACION
+                        if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
+                        r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
+                        if not esperar('btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
+                        r.click('body')
+                        r.wait(2)
+                        r.type('chkBypassWorkflowCheck', '') # Check box ¿Requiere reconocimiento del proveedor?
+                        r.vision('type(Key.SPACE)')
+                        r.click('/html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]') # ??????
+                        r.wait(2)
+                        r.type('btnConfirmGen', '') # Botón Confirmar
+                        r.vision('type(Key.SPACE)')
+                        r.wait(5)
+                        r.frame()
+                        
+                    # Terminar Edición del Contrato
+                    terminar_edicion_contrato(i, proceso)
+                    continue
 
-        echo --- 1 Informacion General --- proceso `proceso`---
-        if present('//*[@id="IncTaskApproval_incTreeView_1TaskTreeGroup1Task1CellApproveDate"]/span/font')
-            click btnMakeModification
-            wait 5
-            if present('lnkModifyContractGeneralLink')
-                echo --- Ingresa --- proceso `proceso`---
-                click lnkModifyContractGeneralLink
+                r.wait(10)
+                print('--- Evalua Aceptado por el proveedor ---')
+                if r.present('Aceptado por'):
+                    r.click('//*[@id="lnkEditLink_0"]')
+                    if not esperar('//*[@id="lblRowModifyContractGeneralMsg"]', '??????'): continue
+                    r.click('//*[@id="btnFinishModification"]') # ??????
+                    r.wait(10)
+                    if r.present('//*[@id="btnConfirmInvoicesWarningButton"]'):
+                        r.click('//*[@id="btnConfirmInvoicesWarningButton"]') # ??????
+                        r.wait(10)
+                    completo_pbl = r.read('//*[@id="dtmbContractEnd_txt"]') # ??????
+                    r.write(proceso + ',' + completo_pbl, 'completo_pbl.csv')
+                    r.wait(10)
+                    if not esperar('//*[@id="btnMakeModification"]', '??????'): continue
+                    if r.present('//*[@id="trRowToolbarTop_tdCell1_tbToolBar_lnkBack"]'):
+                        r.click('//*[@id="trRowToolbarTop_tdCell1_tbToolBar_lnkBack"]') # ??????
+                        if not esperar('//*[@id="btnMakeModification"]', '??????'): continue
+
+                    # Paso 8: ??????
+                    print('Paso 8: ????????')
+                    print('--- 8 ?????? --- proceso', proceso)
+                    r.click('stepCircle_8') # Modificacion del Contrato
+                    if not esperar('//*[@id="stepCircleSelected_8"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_8'): continue
+                    if r.present('//*[@id="IncTaskApproval_incTreeView_1TaskTreeGroup1Task1CellApproveDate"]/span/font'):
+                         r.click('btnMakeModification') # ??????
+                         r.wait(5)
+                         if r.present('lnkModifyContractGeneralLink'):
+                            print('--- Ingresa --- proceso', proceso)
+                            r.click('lnkModifyContractGeneralLink') # ??????
+
+                            # Frame TIPO DE MODIFICACION
+                            if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
+                            r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
+                            if not esperar('btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
+                            r.click('body')
+                            r.wait(2)
+                            r.type('chkBypassWorkflowCheck', '') # Check box ¿Requiere reconocimiento del proveedor?
+                            r.vision('type(Key.SPACE)')
+                            r.click('/html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]') # ??????
+                            r.wait(2)
+                            r.type('btnConfirmGen', '') # Botón Confirmar
+                            r.vision('type(Key.SPACE)')
+                            r.wait(5)
+                            r.frame()
+
+                            # Terminar Edición del Contrato
+                            terminar_edicion_contrato(i, proceso)
+                            continue
                 
-                // Esperar cargue del frame y del elemento esperado en la p�gina
-                esperado = 'ProcurementContractModificationConfirmCreateTypeModal_iframe'
-                esperado2 = 'btnConfirmGen'
-                tagui C:\secop2\modificacion\WorkFlow7.tag
-                frame ProcurementContractModificationConfirmCreateTypeModal_iframe
-                    click body
-                    wait 2
-                    type chkBypassWorkflowCheck as ""
-                    vision type(Key.SPACE)
-                    click /html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]
-                    wait 2
-                    type btnConfirmGen as ""
-                    vision type(Key.SPACE)
-                
-                wait 5
-                
-                // Terminar Edici�n del Contrato
-                tagui C:\secop2\modificacion\WorkFlow8.tag
-                break
+                print('--- Evalua En Aprobada---')
+                if r.present('Aprobada'):
+                    r.click('//*[@id="lnkEditLink_0"]')
+                    if not esperar('//*[@id="lblRowModifyContractGeneralMsg"]', '??????'): continue
+                    r.click('//*[@id="btnFinishModification"]')
+                    r.wait(15)
+                    if r.present('//*[@id="btnConfirmInvoicesWarningButton"]'):
+                        r.type('//*[@id="btnConfirmInvoicesWarningButton"]', '')
+                        r.vision('type(Key.SPACE)')
+                        r.wait(3)
+                    if not esperar('//*[@id="btnMakeModification"]', '??????'): continue
+                    if r.present('//*[@id="trRowToolbarTop_tdCell1_tbToolBar_lnkBack"]'):
+                        r.click('//*[@id="trRowToolbarTop_tdCell1_tbToolBar_lnkBack"]')
+                        if not esperar('//*[@id="btnMakeModification"]', '??????'): continue
+                    
+                    # Paso 8: ??????
+                    print('Paso 8: ????????')
+                    print('--- 8 ?????? --- proceso', proceso)
+                    r.click('stepCircle_8') # Modificacion del Contrato
+                    if not esperar('//*[@id="stepCircleSelected_8"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_8'): continue
+                    r.wait(5)
+                    print('--- Evalua --- proceso', proceso)
+                    if r.present('//*[@id="spnModificationStatusValue_0"]'):
+                        modificacion = r.read('//*[@id="spnModificationStatusValue_0"]') # ??????
+                        fecha = r.read('//*[@id="dtmbModificationDateValue_0_txt"]') # ??????
+                        r.write(proceso + ',' + modificacion + ',' + fecha, 'modificacion.csv')
+                    else:
+                        r.write(proceso + ',ninguno', 'modificacion.csv')
+                    
+                    if r.present('//*[@id="IncTaskApproval_incTreeView_1TaskTreeGroup1Task1CellApproveDate"]/span/font'):
+                        r.click('btnMakeModification')
+                        r.wait(5)
+                        if r.present('lnkModifyContractGeneralLink'):
+                            print('--- Ingresa --- proceso', proceso)
+                            r.click('lnkModifyContractGeneralLink')
+                        
+                            # Frame TIPO DE MODIFICACION
+                            if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
+                            r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
+                            if not esperar('btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
+                            r.click('body')
+                            r.wait(2)
+                            r.type('chkBypassWorkflowCheck', '') # Check box ¿Requiere reconocimiento del proveedor?
+                            r.vision('type(Key.SPACE)')
+                            r.click('/html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]') # ??????
+                            r.wait(2)
+                            r.type('btnConfirmGen', '') # Botón Confirmar
+                            r.vision('type(Key.SPACE)')
+                            r.wait(5)
+                            r.frame()
+
+                            # Terminar Edición del Contrato
+                            terminar_edicion_contrato(i, proceso)
+                            continue
 
 
-    # Paso 0: Crear proceso
-    contrato = dfbase.loc[i, 'NUMERO DE CONTRATO']
-    print('Paso 0: Crear proceso -',contrato,'-',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'--------------------------------------------------')
-    # Agregar una fila con el inicio en los archivos historico.csv y seguimiento.csv
-    mensaje('Inicia')
-    # Menú Procesos
-    if not esperar('//*[@value="Procesos"]', 'Botón Procesos'): continue
-    r.click('//*[@value="Procesos"]') # Menú Procesos
-    if not esperar('//*[@id="lnkSubItem9"]', 'Subnemú Tipos de procesos'): continue
-    r.click('//*[@id="lnkSubItem9"]') # Submenú Tipos de procesos
-
-    # En la página de Tipos de procesos
-    if not esperar('//*[@id="btnCreateProcedureButton12"]', 'Botón Crear Contratación régimen especial'): continue
-    r.click('//*[@id="btnCreateProcedureButton12"]') # Botón Crear Contratación régimen especial
-
-    # Frame CREAR PROCESO
-    if not esperar('CreateProcedure_iframe', 'Frame CREAR PROCESO'): continue
-    r.frame('CreateProcedure_iframe')
-    if not esperar('txtProcedureReference', 'Campo Número del proceso',frame='CreateProcedure_iframe'): continue
-    r.type('txtProcedureReference', '[clear]' 
-           + dfbase.loc[i, 'TIPOLOGIA'] + '-' 
-           + contrato + '-' 
-           + dfbase.loc[i, 'VIGENCIA']) # Número de proceso
-    r.type('txtProcedureName', '[clear]' 
-           + 'PRESTAR SERVICIOS PROFESIONALES Y APOYO A LA GESTION') # Nombre
-    r.type('txtBusinessOperationText', '[clear]' 
-           + 'DIRECCIÓN DE CONTRATACIÓN') # Unidad de contratación
-    r.vision('type(" - COMPRAS")')
-    r.wait(2)
-    r.vision('type(Key.DOWN)')
-    r.vision('type(Key.ENTER)')
-    r.wait(2)
-    r.type('btnSaveCurrentDossierTop', '[enter]') # Botón Confirmar
-    r.frame()
-
-    # Paso 1: Información general
-    print('Paso 1: Información general')
-    if not esperar('txaDossierDescription', 'Campo Descripción'): continue
-    r.type('txaDossierDescription', '[clear]' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
-    r.click('divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText') # Código UNSPSC
-    r.vision('type("85101600")')
-    r.wait(2)
-    r.vision('type(Key.DOWN)')
-    r.vision('type(Key.ENTER)')
-    r.wait(2)
-    r.type('btnAddAcquisitionButton', '[enter]') # Adquisición del PAA
-
-    # Frame BUSCAR POR ADQUISICIONES PLANEADAS
-    if not esperar('wndSearchPlannedAcquisitions_iframe', 'Frame CREAR PROCESO'): continue
-    r.frame('wndSearchPlannedAcquisitions_iframe')
-    if not esperar('txtSearchAcquisitionTXT', 'Campo Número del proceso',frame='CreateProcedure_iframe'): continue
-    r.type('rdbgType_1', '') # ?????
-    r.vision('type(Key.SPACE)')
-    r.wait(5)
-    r.vision('type(Key.TAB)')
-    r.vision('type(Key.ENTER)')
-    r.wait(5)
-    if dfbase.loc[i, 'NOMBRE RUBRO'] == "Honorarios":
-        r.type('chkGridAcqCheckBox_3', '') # ??????
-    elif dfbase.loc[i, 'NOMBRE RUBRO'] == "Remuneracion Servicios Tecnicos":
-        r.type('chkGridAcqCheckBox_4', '') # ??????
-    else:
-        r.type('grdPlannedAcquisitionsGrid_Paginator_goToPage_Next', '') # ??????
-        r.vision('type(Key.SPACE)')
-        r.wait(2)
-        if dfbase.loc[i, 'NOMBRE RUBRO'] == "Contratacion Servicios Asistenciales Generales":
-            r.type('chkGridAcqCheckBox_6', '') # ??????
-        elif dfbase.loc[i, 'NOMBRE RUBRO'] == "Contratacion Servicios Asistenciales PIC":
-            r.type('chkGridAcqCheckBox_5', '') # ??????
-    r.vision('type(Key.SPACE)')
-    r.wait(2)
-    r.type('btnConfirmAcquisitionsSelection', '') # ??????
-    r.vision('type(Key.ENTER)')
-    r.wait(2)
-    r.frame()
-
-    # Información del contrato ??????
-    if not esperar('rdbgOnlyPublicityOptions_1', '??????'): continue
-    r.click('rdbgOnlyPublicityOptions_1') # ??????
-    r.wait(5)
-    r.select('selTypeOfContractSelect', 'ServicesProvisioning') # ??????
-    if not esperar('selJustificationTypeOfContractSelected', '??????'): continue
-    r.select('selJustificationTypeOfContractSelected', 'ApplicableRule') # ??????
-    # Verificar la Duración estimada del contrato
-    if dfbase.loc[i, 'DIAS'] == '0':
-        r.type('nbxDurationGen', dfbase.loc[i, 'MESES'])  # Ingresar meses si los días son 0
-        r.select('selDurationTypeP2Gen', 2)  # Seleccionar tipo de duración en meses
-    else:
-        r.type('nbxDurationGen', dfbase.loc[i, 'DIAS'])  # Campo Duración estimada del contrato
-    r.wait(5)
-
-    # Guardar información general
-    r.wait(5)
-    r.click('btnSaveProcedureTop') # Botón Guardar
-    r.wait(5) # Esperar que aparezca el mensaje verde Proceso guardado con éxito
-    r.click('btnApproveDossier') # Botón Continuar
-    r.wait(5)
-    if not esperar('//*[@id="btnNoPAAPublishedCurrentYearConfirmDialogModal"]', '??????'): continue
-    r.click('//*[@id="btnNoPAAPublishedCurrentYearConfirmDialogModal"]') # ??????
-    r.wait(5)
-
-    # Paso 2: Configuración
-    print('Paso 2: Configuración')
-    # Cronograma
-    if not esperar('//*[@id="stepDiv_2"][@class="LeftMenuButtonOn Black"]', '??????'): continue
-    r.click('rdbgComplyWithMinimalPurchaseValue_1') # ??????
-    r.wait(5)
-    r.click('rdbgProcessAssociatedWithSentenceT302Value_1') # ??????
-    r.wait(5)
-    r.type('dtmbContractSignatureDate_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 00:00') # Campo Fecha de firma del contrato
-    r.type('dtmbStartDateExecutionOfContract_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 00:00') # Campo Fecha de inicio de ejecución del contrato
-    r.type('dtmbExecutionOfContractTerm_txt', dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Plazo de ejecución del contrato
-    r.click('body')
-
-    # Configuración financiera
-    r.click('rdbgWarrantiesField_0')
-    r.wait(5)
-    if dfbase.loc[i, 'PORCENTAJE_CONTRATO'] == "10":
-        r.click('//*[@id="rdbgWarrantiesByLotsGroupsStagesField_1"]')
-        r.wait(5)
-        r.click('chkComplianceContractCB')
-        r.wait(5)
-        r.click('//*[@id="tdComplianceContractPercentageRBCell_divComplianceContractPercentageRBDiv_rdbComplianceContractPercentageRB"]')
-        r.wait(5)
-        r.type('//*[@id="nbxComplianceContractPercentageField"]', '[clear]' + dfbase.loc[i, 'PORCENTAJE_CONTRATO'])
-        r.wait(2)
-        r.type('dtmbComplianceContractStartDateBox_txt', '[clear]' + dfbase.loc[i, 'FECHA_DESDE_POLIZA'] + ' 00:00')
-        r.type('dtmbComplianceContractEndDateBox_txt', '[clear]' + dfbase.loc[i, 'FECHA_HASTA_POLIZA'] + ' 23:59')
-        r.click('rdbgCivilLiabilityField_1')
-    elif dfbase.loc[i, 'PORCENTAJE_CONTRATO'] == "0":
-        r.click('//*[@id="rdbgWarrantiesByLotsGroupsStagesField_1"]')
-        r.wait(5)
-        r.click('//*[@id="rdbgComplianceField_1"]')
-        r.wait(3)
-        r.click('//*[@id="rdbgCivilLiabilityField_0"]')
-        r.wait(5)
-        r.type('cbxCivilLiabilityValueField', dfbase.loc[i, 'PORCENTAJE_CONTRATO'])
-    r.wait(5)
-
-    # Precios
-    r.type('cbxBasePrice', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Valor estimado
-    r.click('body')
-    r.wait(5)
-
-    # Información presupuestal
-    r.click('//*[@id="rdbgFrameworkAgreementValue_1"]') # Radio button Implementación del Acuerdo de Paz
-    r.wait(5)
-    r.type('rdbgFrameworkAgreementValue_1', '') # Radio button Implementación del Acuerdo de Paz No
-    r.vision('type(Key.ENTER)')
-    r.vision('type(Key.SPACE)')
-
-    r.click('selBudgetSourceSelect') # Lista Destinación del gasto
-    r.vision('type(key.DOWN)')
-    r.vision('type(key.ENTER)')
-
-    r.click('body')
-    r.wait(2)
-
-    if r.present('cbxOwnResourcesAGRIValue'):
-        r.click('rdbgBudgetOriginGNBCheckValueP2Gen_1')
-        r.wait(2)
-        r.click('rdbgBudgetOriginGSPCheckValueP2Gen_1')
-        r.wait(2)
-        r.click('rdbgBudgetOriginGRSCheckValueP2Gen_1')
-        r.wait(2)
-        r.click('rdbgBudgetOriginOwnResourcesAGRICheckValueP2Gen_1')
-        r.wait(2)
-        r.click('rdbgBudgetOriginCreditResourcesCheckValueP2Gen_1')
-        r.wait(2)
-        r.click('rdbgBudgetOriginOwnResourcesCheckValueP2Gen_0')
-        r.wait(2)
-        r.type('cbxBudgetOriginOwnResourcesValue', '[clear]')
-        r.wait(2)
-        r.click('cbxBudgetOriginOwnResourcesValue')
-        r.vision('type(Key.DELETE)')
-        #r.vision_step(f'valor_contrato = "{dfbase.loc[i, 'VALOR CONTRATO']}"')
-        r.vision(f'type({dfbase.loc[i, 'VALOR CONTRATO']})')
-
-    r.wait(5)
-    r.click('body')
-    r.wait(3)
-    r.type('btnAddCode', '[enter]')
-    r.vision('type(Key.SPACE)')
-
-    # Frame Información presupuestal
-    if not esperar('SIIFModal_iframe', 'Frame Información presupuestal'): continue
-    r.frame('SIIFModal_iframe')
-    if not esperar('rdbgOptionsToSelectRadioButton_0', 'Radio button CDP',frame='SIIFModal_iframe'): continue
-    r.type('rdbgOptionsToSelectRadioButton_0', '') # Radio button CDP
-    r.vision('type(Key.SPACE)')
-    r.wait(5)
-    r.type('txtSIIFIntegrationItemTextbox', dfbase.loc[i, 'N° DEL CDP']) # Campo Código
-    r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR DEL CDP']) # Campo Saldo
-    r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Saldo a comprometer
-    r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
-    r.type('btnSIIFIntegrationItemButton', '') # Botón Crear
-    r.vision('type(Key.ENTER)')
-    r.frame()
-    r.wait(5)
-
-    r.click('btnSaveProcedureTop') # Botón Guardar
-    r.wait(5)
-
-    # Paso 3: Cuestionario
-    print('Paso 3: Cuestionario')
-    r.click('stepCircle_3') # stepCircle Cuestionario
-    if not esperar('//*[@id="stepDiv_3"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_3'): continue
-    r.wait(5)
-    r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[3]/td[4]') # ??????
-    r.wait(5)
-    r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input[1]') # Campo Código UNSPSC
-    r.vision('type("85101600")')
-    r.wait(2)
-    r.vision('type(key.DOWN)')
-    r.vision('type(key.ENTER)')
-    r.wait(2)
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[3]/input', dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input', '1') # Campo Cantidad
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input', dfbase.loc[i, 'VALOR CONTRATO'])
-    r.click('btnSaveProcedureTop') # Botón Guardar
-    r.wait(5)
-
-    # Paso 4: Documentos del proceso
-    print('Paso 4: Documentos del proceso')
-    r.click('stepCircle_4') # stepCircle Documentos del proceso
-    if not esperar('//*[@id="stepDiv_4"][@class="LeftMenuButtonOn Black"]', 'stepCircle Documentos del proceso en negro', stepCircle='stepCircle_4'): continue
-    r.wait(5)
-    r.type('incContractDocumentstxaExternalCommentsGen', 'Se anexa requerimiento segun necesidad de la institucion')
-    r.wait(10)
-    r.click('incContractDocumentsbtnUploadDocumentGen') # Botón Anexar documento
-    r.wait(15)
-
-    # Ventana emergente ANEXAR DOCUMENTO
-    r.popup('OnDocumentsUploaded')
-    r.click('divAddFilesButton') # Botón Buscar documento
-    #r.vision_step(f'req = "{req}"')
-    r.wait(10)
-    r.vision(f'type("{repositorio}\\documentos\\{dfbase.loc[i, 'REQUERIMIENTO']}.pdf")') # Ruta del documento
-    r.wait(10)
-    r.vision('type(Key.ENTER)')
-    r.wait(10)
-    r.click('btnUploadFilesButtonBottom') # Botón subir ??????
-    if not esperar('//*[@id="tblFilesTable"]//*[@processed="success"]', '?????? progreso'): continue
-    r.click('btnCancelBottomButtom') # Botón cerrar ??????
-    r.popup(None)  # Cierra el contexto del popup
-
-    r.wait(10)
-    r.click('body')
-    r.wait(10)
-    r.click('btnSaveProcedureTop') # Botón Guardar documentos anexos
-    r.wait(15)
-    r.click('btnOption_trRowToolbarTop_tdCell1_tbToolBar_Finish') # Botón Ir a publicar
-    r.wait(5)
-
-    # Frame PUBLICAR PROCESO
-    r.frame('StartApprovalSupportModal_iframe')
-    if not esperar('btnConfirmGen', 'Botón Confirmar',frame='StartApprovalSupportModal_iframe'): continue
-    r.type('btnConfirmGen', '') # Botón Confirmar
-    r.vision('type(Key.ENTER)')
-    r.frame()
-
-    # Agregar una fila con el final en los archivos historico.csv y seguimiento.csv
-    mensaje('Finaliza')
-    
 # Cerrar robot
 print('Cerrar robot', robot)
 r.close()
