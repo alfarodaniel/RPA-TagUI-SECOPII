@@ -333,6 +333,7 @@ if r.present('btnAcknowledgeGen'):
 # Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
+    #i=0
     proceso = 'CPS-' + dfbase.loc[i, 'NUMERO DE CONTRATO'] + '-' + dfbase.loc[i, 'VIGENCIA']
 
     # Cargar página principal
@@ -343,20 +344,23 @@ for i in range(0, len(dfbase)):
     r.click('//*[@value="Procesos"]') # Menú Procesos
     r.click('//*[@id="lnkSubItem6"]') # Submenú Procesos de la Entidad Estatal
     if not esperar('txtSimpleSearchInput', 'Campo Búsqueda avanzada'): continue
-    r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada ??????
-    r.type('txtReferenceTextbox', '[clear]' + proceso + '[enter]') # Campo Número del proceso ??????
+    r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada
+    r.type('txtReferenceTextbox', '[clear]' + proceso + '[enter]') # Campo Referencia
     r.wait(2)
-    r.type('//*[@id="dtmbCreateDateFromBox_txt"]', '[clear]01/01/2021') # Campo Fecha de creación desde
+    r.type('//*[@id="dtmbCreateDateFromBox_txt"]', '[clear]01/01/2023') # Campo Fecha de creación desde
     r.wait(3)
-    r.click('btnSearchButton') # Botón Buscar ??????
+    r.click('btnSearchButton') # Botón Buscar
+    
     r.wait(30)
     r.click('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]') # Menú desplegable Mis procesos
-    r.vision('type(Key.UP)') # Subir una opción a Todos
-    r.vision('type(Key.ENTER)') # Seleccionar Todos
+    #r.vision('type(Key.UP)') # Subir una opción a Todos
+    #r.vision('type(Key.ENTER)') # Seleccionar Todos
+    r.click('//*[@id="selFilteringStatesSel_child"]/ul/li[1]') # Seleccionar Todos
     r.wait(20)
+
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
-    if not esperar('incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Campo Búsqueda avanzada ????'): continue
-    r.click('lnkProcurementContractViewLink_0') # # ??????
+    if not esperar('incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Boton Detalle'): continue
+    r.click('lnkProcurementContractViewLink_0') # Referencia
 
     # Paso 1: Modificación del Contrato
     print('Paso 1: Modificación del Contrato')
