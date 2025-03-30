@@ -341,13 +341,11 @@ for i in range(0, len(dfbase)):
 
     # Paso 0: Acceder al contrato
     print('Paso 0: Acceder al contrato -',proceso,'-',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'--------------------------------------------------')
-    if not esperar('//*[@value="Procesos"]', 'Menú desplegable Procesos'): continue
     r.click('//*[@value="Procesos"]') # Menú Procesos
     r.click('//*[@id="lnkSubItem6"]') # Submenú Procesos de la Entidad Estatal
     if not esperar('txtSimpleSearchInput', 'Campo Búsqueda avanzada'): continue
     r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada
     #r.wait(30)
-    if not esperar('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]', 'Menú desplegable Mis procesos'): continue
     r.click('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]') # Menú desplegable Mis procesos
     #r.vision('type(Key.UP)') # Subir una opción a Todos
     #r.vision('type(Key.ENTER)') # Seleccionar Todos
@@ -364,45 +362,11 @@ for i in range(0, len(dfbase)):
     if not esperar('incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Boton Detalle'): continue
     r.click('lnkProcurementContractViewLink_0') # Referencia
 
-    # Paso 1: 8 Modificaciones del Contrato
-    print('Paso 1:  8 Modificaciones del Contrato')
-    if not esperar('//*[@id="lnk_stpmStepManager9"]', 'Menú 8 Modificacione del Contrato'): continue
-    r.click('//*[@id="lnk_stpmStepManager9"]') # Menú 8 Modificacione del Contrato
-    if not esperar('//*[@id="btnMakeModification"]', 'Botón Modificar'): continue
-    r.click('//*[@id="btnMakeModification"]') # Botón Modificar
-    
-    # Paso 2: 1 Modificación del Contrato
-    print('Paso 2: 1 Modificación del Contrato')
-    if not esperar('lnkModifyContractGeneralLink', 'Enlace Modificar el contrato'): continue
-    r.click('lnkModifyContractGeneralLink') # Enlace Modificar el contrato
-
-    # Frame TIPO DE MODIFICACION
-    #if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
-    r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
-    if not esperar('btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
-    #r.click('body')
-    r.click('//*[@id="chkBypassWorkflowCheck"]')
+    # Paso 1: Modificación del Contrato
+    print('Paso 1: Modificación del Contrato')
+    if not esperar('//*[@id="spnContractState"]', 'Valor de Estado de contrato'): continue
+    r.click('//*[@id="spnContractState"]') # ??????
     r.wait(2)
-    #r.type('//*[@id="chkBypassWorkflowCheck"]', '') # Check box ¿Requiere reconocimiento del proveedor?
-    #r.vision('type(Key.SPACE)')
-    #r.click('/html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]') # ?????? 
-    r.wait(2)
-    #r.type('btnConfirmGen', '') # Botón Confirmar
-    #r.vision('type(Key.SPACE)')
-    r.click('btnConfirmGen')
-    r.wait(5)
-    r.frame()
-
-
-
-
-
-
-
-
-
-
-
     general = r.read('//*[@id="spnContractState"]') # ??????
     fecha_general = r.read('//*[@id="dtmbContractEnd_txt"]') # ??????
     r.write(proceso + ',' + general + ',' + fecha_general, 'general.csv')
