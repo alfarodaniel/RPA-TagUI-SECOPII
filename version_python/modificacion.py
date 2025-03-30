@@ -340,7 +340,7 @@ for i in range(0, len(dfbase)):
     r.url('https://community.secop.gov.co/')
 
     # Paso 0: Acceder al contrato
-    print('Paso 0: Acceder al contrato -',proceso,'-',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'--------------------------------------------------')
+    print('Paso 0: Acceder al contrato --- proceso',proceso,'-',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'--------------------------------------------------')
     if not esperar('//*[@value="Procesos"]', 'Menú desplegable Procesos'): continue
     r.click('//*[@value="Procesos"]') # Menú Procesos
     r.click('//*[@id="lnkSubItem6"]') # Submenú Procesos de la Entidad Estatal
@@ -353,11 +353,11 @@ for i in range(0, len(dfbase)):
     #r.vision('type(Key.ENTER)') # Seleccionar Todos
     r.click('//*[@id="selFilteringStatesSel_child"]/ul/li[1]') # Seleccionar Todos
     #r.wait(20)
-    r.wait(3)
+    r.wait(2)
     r.type('txtReferenceTextbox', '[clear]' + proceso + '[enter]') # Campo Referencia
     r.wait(2)
     r.type('//*[@id="dtmbCreateDateFromBox_txt"]', '[clear]01/01/2023') # Campo Fecha de creación desde
-    r.wait(3)
+    r.wait(2)
     r.click('btnSearchButton') # Botón Buscar
     if not esperar('//*[@title="' + proceso + '"]', 'Titulo proceso'): continue
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
@@ -365,14 +365,14 @@ for i in range(0, len(dfbase)):
     r.click('lnkProcurementContractViewLink_0') # Referencia
 
     # Paso 1: 8 Modificaciones del Contrato
-    print('Paso 1:  8 Modificaciones del Contrato')
+    print('Paso 1:  8 Modificaciones del Contrato --- proceso', proceso)
     if not esperar('//*[@id="lnk_stpmStepManager9"]', 'Menú 8 Modificacione del Contrato'): continue
     r.click('//*[@id="lnk_stpmStepManager9"]') # Menú 8 Modificacione del Contrato
     if not esperar('//*[@id="btnMakeModification"]', 'Botón Modificar'): continue
     r.click('//*[@id="btnMakeModification"]') # Botón Modificar
     
     # Paso 2: 1 Modificación del Contrato
-    print('Paso 2: 1 Modificación del Contrato')
+    print('Paso 2: 1 Modificación del Contrato --- proceso', proceso)
     if not esperar('lnkModifyContractGeneralLink', 'Enlace Modificar el contrato'): continue
     r.click('lnkModifyContractGeneralLink') # Enlace Modificar el contrato
 
@@ -392,6 +392,47 @@ for i in range(0, len(dfbase)):
     r.click('btnConfirmGen')
     r.wait(5)
     r.frame()
+
+    # Paso 3: 4 Bienes y Servicios
+    print('Paso 3: 4 Bienes y Servicios --- proceso', proceso)
+    r.click('stepCircle_4') # Bienes y Servicios
+    if not esperar('//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_4'): return False
+    r.click('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[2]/td[4]') # Símbolo + en Incluya el precio como lo indique la Entidad Estatal
+    if not esperar('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', 'Campo Precio unitario'): return False
+    r.dclick('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input') # Campo Precio unitario
+    r.type('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR TOTAL']) # Campo Precio unitario
+
+    # Paso 4: 7 Informacion presupuestal
+    print('Paso 4: 7 Información presupuestal --- proceso', proceso)
+    r.click('stepCircle_7') # Informacion presupuestal
+    if not esperar('//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_7'): return False
+    if not esperar('cbxOwnResourcesAGRIValue', 'Campo Recursos Propios'): return False
+    r.dclick('cbxOwnResourcesAGRIValue') # Campo Recursos Propios
+    r.type('cbxOwnResourcesAGRIValue', dfbase.loc[i, 'VALOR TOTAL']) # Campo Recursos Propios
+    #r.wait(2)
+    r.click('btnAddCode') # Botón Agregar de CDP/Vigencias Futuras
+
+    # Frame Información presupuestal
+    r.frame('SIIFModal_iframe')
+    esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
+    #if not esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): return False
+    r.type('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Yes') # Radio button CDP
+    r.vision('type(Key.SPACE)') 
+    r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código
+    r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') 
+    r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Código
+    r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Saldo a comprometer445445
+    r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
+    r.type('btnSIIFIntegrationItemButton', 'yes') # Botón Crear
+    #r.type('btnSIIFIntegrationItemCancelButton', 'yes') # Botón Cancelar
+    r.vision('type(Key.SPACE)')
+    r.frame()
+    
+
+
+
+
+
 
 
 
