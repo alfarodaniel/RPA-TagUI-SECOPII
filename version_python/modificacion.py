@@ -6,6 +6,7 @@ Modificación de información contracual en SECOP II de la información listada 
 # Cargar librerías
 import rpa as r
 import pandas as pd
+import re
 from datetime import datetime
 import sys
 
@@ -72,7 +73,7 @@ def mensaje(mensaje):
 
 
 # Función para validar si existe el registro en la página
-def esperar(objeto, descripcion="", frame="", stepCircle=""):
+def esperar(objeto, descripcion="", frame="", stepCircle="", popup=""):
     for i in range(1, espera):
         # Verificar si se encuentra en un frame
         if frame != "":
@@ -80,6 +81,9 @@ def esperar(objeto, descripcion="", frame="", stepCircle=""):
         # Verificar si se encuentra en un stepCircle
         if stepCircle != "":
             r.click(stepCircle)
+        # Verificar si se encuentra en un popup
+        if popup != "":
+            r.popup(popup)
         # Verifica si se encontró objeto
         if r.present(objeto):
             #print('si')
@@ -414,25 +418,60 @@ for i in range(0, len(dfbase)):
 
     # Frame Información presupuestal
     r.frame('SIIFModal_iframe')
-    esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
-    #if not esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): return False
+    #esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
+    if not esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): return False
     r.type('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Yes') # Radio button CDP
-    r.vision('type(Key.SPACE)') 
+    r.vision('type(Key.SPACE)') # Radio button CDP
     r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código
-    r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') 
-    r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Código
-    r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Saldo a comprometer445445
+    r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') # Campo Código
+    r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Saldo
+    r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Valor a utilizar
     r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
     r.type('btnSIIFIntegrationItemButton', 'yes') # Botón Crear
     #r.type('btnSIIFIntegrationItemCancelButton', 'yes') # Botón Cancelar
-    r.vision('type(Key.SPACE)')
+    r.vision('type(Key.SPACE)') # Botón Crear
     r.frame()
     
+    # Paso 5: 1 Modificación del Contrato
+    print('Paso 5: 1 Modificación del Contrato --- proceso', proceso)
+    r.click('stepCircle_1') # Menù 1 Modificación del Contrato
+    if not esperar('//*[@id="stepCircleSelected_1"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_1'): return False
+    r.wait(2)
+    r.click('cmAttachmentsOptions') # Lista Anexar documentos
+    r.wait(2)
+    r.click('linkUploadNew') # Item Anexar nuevo documento
+    #r.vision('type(Key.TAB)')
+    #r.vision('type(Key.ENTER)')
+    #r.wait(5)
+    
+    # Popup ANEXAR DOCUMENTO
+    r.popup('DocumentAlternateUpload')
+    #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
+    if not esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): return False
+    r.click('divAddFilesButton') # Boton Buscar documento
+    r.wait(5)
+    rutaarchivo = re.sub(r'\\+', r'\\', f'{repositorio}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO"]}.zip')
+    r.vision(f'type("{rutaarchivo}")') # Ruta del documento
+    r.vision('type(Key.ENTER)')
+    r.wait(5)
+    r.click('btnUploadFilesButtonBottom') # Botón Anexar
+    if not esperar('//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): return False
+    r.click('btnCancelBottomButtom') # Botón Cerrar
+    r.popup(None) # Cierra el contexto del popup
 
+    if not esperar('txaModificationPurpose', 'Campo Justificación de la modificación'): return False
+    r.type('txaModificationPurpose', 'Modificación') # Campo Justificación de la modificación
 
-
-
-
+    print('--- Finalizar Modificacion --- proceso', proceso)
+    r.click('btnOption_tbContractToolbar_Finish') # ??????
+    r.wait(5)
+    r.type('chkCheckBoxAgreeTerms', '') # Check box Acepto el valor del contrato
+    r.wait(2)
+    r.vision('type(Key.SPACE)')
+    r.wait(5)
+    r.type('btnContractTotalValueValidationConfirmDialogModal', '') # Boton Confirmar
+    r.wait(2)
+    r.vision('type(Key.SPACE)')
 
 
 
