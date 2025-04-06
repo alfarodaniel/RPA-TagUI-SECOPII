@@ -10,8 +10,8 @@ import re
 from datetime import datetime
 import sys
 
-import os
-os.chdir("C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\")
+#import os
+#os.chdir("C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\")
 #print("Directorio actual:", os.getcwd())
 
 # Redirigir la salida estándar y de error a un archivo log.txt
@@ -61,9 +61,9 @@ dfbase = pd.read_excel(base, dtype=str)
 #print('Valor de la columna NUMERO para el primer registro:', primer_registro_numero)
 
 
-# Funcion mensaje para agregar una fila con el mensaje en los archivos historico.csv y seguimiento.csv
-def mensaje(mensaje):
-    for archivo in [f"{repositorio}historico.csv", "seguimiento.csv"]:
+# Funcion mensaje para agregar una fila con el mensaje en los archivos historico.csv
+def mensaje(mensaje, repositorio=''):
+    for archivo in [f"{repositorio}historico.csv"]:
         with open(archivo, 'a') as file:
             file.write(robot + ',' + 
                     usuario + ',' + 
@@ -73,8 +73,11 @@ def mensaje(mensaje):
 
 
 # Función para validar si existe el registro en la página
-def esperar(objeto, descripcion="", frame="", stepCircle="", popup=""):
+def esperar(objeto, descripcion="", boton="", frame="", stepCircle="", popup=""):
     for i in range(1, espera):
+        # Verificar si depende de un boton
+        if boton != "":
+            r.click(boton)
         # Verificar si se encuentra en un frame
         if frame != "":
             r.frame(frame)
@@ -344,9 +347,12 @@ for i in range(0, len(dfbase)):
     r.url('https://community.secop.gov.co/')
 
     # Paso 0: Acceder al contrato
-    print('Paso 0: Acceder al contrato --- proceso',proceso,'-',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'--------------------------------------------------')
+    horainicio = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print('Paso 0: Acceder al contrato --- proceso',proceso,'-',horainicio,'--------------------------------------------------')
+    mensaje('Paso 0: Acceder al contrato --- proceso '+proceso+' - '+horainicio)
     if not esperar('//*[@value="Procesos"]', 'Menú desplegable Procesos'): continue
     r.click('//*[@value="Procesos"]') # Menú Procesos
+    if not esperar('//*[@id="lnkSubItem6"]', 'Submenú Procesos de la Entidad Estatal'): continue
     r.click('//*[@id="lnkSubItem6"]') # Submenú Procesos de la Entidad Estatal
     if not esperar('txtSimpleSearchInput', 'Campo Búsqueda avanzada'): continue
     r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada
@@ -355,13 +361,14 @@ for i in range(0, len(dfbase)):
     r.click('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]') # Menú desplegable Mis procesos
     #r.vision('type(Key.UP)') # Subir una opción a Todos
     #r.vision('type(Key.ENTER)') # Seleccionar Todos
+    if not esperar('//*[@id="selFilteringStatesSel_child"]/ul/li[1]', 'Seleccionar Todos'): continue
     r.click('//*[@id="selFilteringStatesSel_child"]/ul/li[1]') # Seleccionar Todos
     #r.wait(20)
     r.wait(2)
     r.type('txtReferenceTextbox', '[clear]' + proceso + '[enter]') # Campo Referencia
-    r.wait(2)
+    #r.wait(1)
     r.type('//*[@id="dtmbCreateDateFromBox_txt"]', '[clear]01/01/2023') # Campo Fecha de creación desde
-    r.wait(2)
+    #r.wait(1)
     r.click('btnSearchButton') # Botón Buscar
     if not esperar('//*[@title="' + proceso + '"]', 'Titulo proceso'): continue
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
@@ -386,11 +393,11 @@ for i in range(0, len(dfbase)):
     if not esperar('btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
     #r.click('body')
     r.click('//*[@id="chkBypassWorkflowCheck"]')
-    r.wait(2)
+    r.wait(1)
     #r.type('//*[@id="chkBypassWorkflowCheck"]', '') # Check box ¿Requiere reconocimiento del proveedor?
     #r.vision('type(Key.SPACE)')
     #r.click('/html/body/div[2]/div/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/input[1]') # ?????? 
-    r.wait(2)
+    #r.wait(2)
     #r.type('btnConfirmGen', '') # Botón Confirmar
     #r.vision('type(Key.SPACE)')
     r.click('btnConfirmGen')
@@ -400,31 +407,31 @@ for i in range(0, len(dfbase)):
     # Paso 3: 4 Bienes y Servicios
     print('Paso 3: 4 Bienes y Servicios --- proceso', proceso)
     r.click('stepCircle_4') # Bienes y Servicios
-    if not esperar('//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_4'): return False
+    if not esperar('//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_4'): continue
     r.click('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[2]/td[4]') # Símbolo + en Incluya el precio como lo indique la Entidad Estatal
-    if not esperar('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', 'Campo Precio unitario'): return False
+    if not esperar('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', 'Campo Precio unitario'): continue
     r.dclick('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input') # Campo Precio unitario
     r.type('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR TOTAL']) # Campo Precio unitario
 
     # Paso 4: 7 Informacion presupuestal
     print('Paso 4: 7 Información presupuestal --- proceso', proceso)
     r.click('stepCircle_7') # Informacion presupuestal
-    if not esperar('//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_7'): return False
-    if not esperar('cbxOwnResourcesAGRIValue', 'Campo Recursos Propios'): return False
+    if not esperar('//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_7'): continue
+    if not esperar('cbxOwnResourcesAGRIValue', 'Campo Recursos Propios'): continue
     r.dclick('cbxOwnResourcesAGRIValue') # Campo Recursos Propios
     r.type('cbxOwnResourcesAGRIValue', dfbase.loc[i, 'VALOR TOTAL']) # Campo Recursos Propios
-    #r.wait(2)
-    r.click('btnAddCode') # Botón Agregar de CDP/Vigencias Futuras
+    if not esperar('//*[@id="SIIFModal_iframe"]', 'Frame Información presupuestal',boton='btnAddCode'): continue
+    #r.click('btnAddCode') # Botón Agregar de CDP/Vigencias Futuras
 
     # Frame Información presupuestal
     r.frame('SIIFModal_iframe')
     #esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
-    if not esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): return False
+    if not esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): continue
     r.type('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Yes') # Radio button CDP
     r.vision('type(Key.SPACE)') # Radio button CDP
-    r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código
+    r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código 
     r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') # Campo Código
-    r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Saldo
+    #r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Saldo
     r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Valor a utilizar
     r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
     r.type('btnSIIFIntegrationItemButton', 'yes') # Botón Crear
@@ -435,7 +442,7 @@ for i in range(0, len(dfbase)):
     # Paso 5: 1 Modificación del Contrato
     print('Paso 5: 1 Modificación del Contrato --- proceso', proceso)
     r.click('stepCircle_1') # Menù 1 Modificación del Contrato
-    if not esperar('//*[@id="stepCircleSelected_1"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_1'): return False
+    if not esperar('//*[@id="stepCircleSelected_1"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_1'): continue
     r.wait(2)
     r.click('cmAttachmentsOptions') # Lista Anexar documentos
     r.wait(2)
@@ -447,7 +454,7 @@ for i in range(0, len(dfbase)):
     # Popup ANEXAR DOCUMENTO
     r.popup('DocumentAlternateUpload')
     #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
-    if not esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): return False
+    if not esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): continue
     r.click('divAddFilesButton') # Boton Buscar documento
     r.wait(5)
     rutaarchivo = re.sub(r'\\+', r'\\', f'{repositorio}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO"]}.zip')
@@ -455,23 +462,33 @@ for i in range(0, len(dfbase)):
     r.vision('type(Key.ENTER)')
     r.wait(5)
     r.click('btnUploadFilesButtonBottom') # Botón Anexar
-    if not esperar('//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): return False
+    if not esperar('//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): continue
     r.click('btnCancelBottomButtom') # Botón Cerrar
     r.popup(None) # Cierra el contexto del popup
-
-    if not esperar('txaModificationPurpose', 'Campo Justificación de la modificación'): return False
-    r.type('txaModificationPurpose', 'Modificación') # Campo Justificación de la modificación
-
+    r.wait(5)
+    
     print('--- Finalizar Modificacion --- proceso', proceso)
-    r.click('btnOption_tbContractToolbar_Finish') # ??????
+    r.click('body')
+    if not esperar('txaModificationPurpose', 'Campo Justificación de la modificación'): continue
+    r.type('txaModificationPurpose', 'Modificación') # Campo Justificación de la modificación
+    r.click('btnOption_tbContractToolbar_Finish') # Finalizar Modificacion
+    if not esperar('chkCheckBoxAgreeTerms', 'Check box Acepto el valor del contrato'): continue
+    #r.type('chkCheckBoxAgreeTerms', 'yes') # Check box Acepto el valor del contrato
+    r.click('chkCheckBoxAgreeTerms') # Check box Acepto el valor del contrato
+    #r.wait(2)
+    #r.vision('type(Key.SPACE)')
+    #r.wait(5)
+    #r.type('btnContractTotalValueValidationConfirmDialogModal', '') # Boton Confirmar
+    r.click('btnContractTotalValueValidationConfirmDialogModal') # Boton Confirmar
+    #r.click('btnContractTotalValueValidationCancelDialogModal') # Boton Cancelar
     r.wait(5)
-    r.type('chkCheckBoxAgreeTerms', '') # Check box Acepto el valor del contrato
-    r.wait(2)
-    r.vision('type(Key.SPACE)')
-    r.wait(5)
-    r.type('btnContractTotalValueValidationConfirmDialogModal', '') # Boton Confirmar
-    r.wait(2)
-    r.vision('type(Key.SPACE)')
+    #r.wait(20)
+    #r.vision('type(Key.SPACE)')
+
+    horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print('Terminada Modificación del Contrato --- proceso', proceso, '-', horafin, '--------------------------------------------------')
+    mensaje('Terminada Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+    mensaje('Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, repositorio)
 
 
 
@@ -480,9 +497,7 @@ for i in range(0, len(dfbase)):
 
 
 
-
-
-
+    """
     general = r.read('//*[@id="spnContractState"]') # ??????
     fecha_general = r.read('//*[@id="dtmbContractEnd_txt"]') # ??????
     r.write(proceso + ',' + general + ',' + fecha_general, 'general.csv')
@@ -671,7 +686,13 @@ for i in range(0, len(dfbase)):
                             # Terminar Edición del Contrato
                             terminar_edicion_contrato(i, proceso)
                             continue
+    """
 
+# Cerrar sesión
+print('Cerrar sesion')
+r.click('//*[@id="userImage"]/img') # Imagen usuario
+r.wait(1)
+r.click('//*[@id="logOut"]') # Opción Salir
 
 # Cerrar robot
 print('Cerrar robot', robot)
