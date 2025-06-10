@@ -3,7 +3,58 @@ Automatizar SECOP II modificación
 Funciones
 """
 # Cargar librerías
+from pandas import read_csv
 from datetime import datetime
+import sys
+
+
+# Funcion para redirigir la salida estándar y de error a un archivo log.txt
+def redirigir_log():
+    class Logger:
+        def __init__(self, filename):
+            self.terminal = sys.stdout
+            self.log = open(filename, 'a')
+
+        def write(self, message):
+            self.terminal.write(message)
+            self.log.write(message)
+
+        def flush(self):
+            self.terminal.flush()
+            self.log.flush()
+
+    sys.stdout = Logger('log.txt')
+    sys.stderr = sys.stdout
+
+
+# Funcion para leer el archivo 'parametros.csv' y establecer las variables de configuración
+def parametros():
+    # Leer el archivo 'parametros.csv'
+    print('\nCargando parametros.csv')
+    df = read_csv('parametros.csv')
+
+    # Convertir el DataFrame en un diccionario params
+    params = dict(zip(df['parametro'], df['valor']))
+
+    # Establecer variables de configuración
+    variables = {
+        'repositorio': params.get('repositorio'),
+        #'robot': 'aprobacion_v1',
+        'espera': int(params.get('espera')),
+        'usuario': params.get('usuario'),
+        'user': params.get('user'),
+        'password': params.get('password'),
+        'base': params.get('base'),
+        'contrato': ''
+        # 'llave': params.get('llave'),
+        # 'continuar': True,
+        # 'respositorio_base': repositorio + 'orquestador\\base.db',
+        # 'robot_base': robot + '\\' + base + '.csv',
+        # 'robot_exe': robot + '\\' + robot + '.exe'
+    }
+
+    return variables
+
 
 # Funcion mensaje para agregar una fila con el mensaje en los archivos historico.csv
 def mensaje(variables, mensaje, repositorio=''):
@@ -74,3 +125,32 @@ def cerrar(r):
     r.click('//*[@id="userImage"]/img') # Imagen usuario
     r.wait(1)
     r.click('//*[@id="logOut"]') # Opción Salir
+
+
+# Función para acceder al contrato en SECOP II
+def acceder_contrato(r, proceso, variables):
+    if not esperar(r, variables, '//*[@value="Procesos"]', 'Paso 0: Menú desplegable Procesos'): return False
+    r.click('//*[@value="Procesos"]') # Menú Procesos
+    if not esperar(r, variables, '//*[@id="lnkSubItem6"]', 'Paso 0: Submenú Procesos de la Entidad Estatal'): return False
+    r.click('//*[@id="lnkSubItem6"]') # Submenú Procesos de la Entidad Estatal
+    if not esperar(r, variables, 'txtSimpleSearchInput', 'Paso 0: Campo Búsqueda avanzada'): return False
+    r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada
+    #r.wait(30)
+    if not esperar(r, variables, '//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]', 'Paso 0: Menú desplegable Mis procesos'): return False
+    r.click('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]') # Menú desplegable Mis procesos
+    #r.vision('type(Key.UP)') # Subir una opción a Todos
+    #r.vision('type(Key.ENTER)') # Seleccionar Todos
+    if not esperar(r, variables, '//*[@id="selFilteringStatesSel_child"]/ul/li[1]', 'Paso 0: Seleccionar Todos'): return False
+    r.click('//*[@id="selFilteringStatesSel_child"]/ul/li[1]') # Seleccionar Todos
+    #r.wait(20)
+    r.wait(2)
+    r.type('txtReferenceTextbox', '[clear]' + proceso + '[enter]') # Campo Referencia
+    #r.wait(1)
+    r.type('//*[@id="dtmbCreateDateFromBox_txt"]', '[clear]01/01/2023') # Campo Fecha de creación desde
+    #r.wait(1)
+    r.click('btnSearchButton') # Botón Buscar
+    if not esperar(r, variables, '//*[@title="' + proceso + '"]', 'Paso 0: Titulo proceso'): return False
+    r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
+    if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
+    r.click('lnkProcurementContractViewLink_0') # Referencia
+    return True
