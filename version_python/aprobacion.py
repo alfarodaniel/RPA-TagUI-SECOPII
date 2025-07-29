@@ -18,7 +18,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'aprobacion_v2'
+variables['robot'] = 'aprobacion_v3'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -68,6 +68,10 @@ for i in range(0, len(dfbase)):
         print('Paso 2: Publicar modificación --- proceso', proceso)
         r.click('//*[@id="btnFinishModification"]')
         r.wait(5)
+        # Validar si aparace mensaje informativo
+        if not r.present("//div[@id='mdboxInvoicesWarningDialog' and contains(@style,'display: none')]"):
+            r.click('btnConfirmInvoicesWarningButton')
+            r.wait(5)
         esperar(r, variables, '//*[@id="stepCircleSelected_1"]', 'Paso 2: Menú 1 Modificación del contrato') # Menú 1 Modificación del contrato
 
     horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
