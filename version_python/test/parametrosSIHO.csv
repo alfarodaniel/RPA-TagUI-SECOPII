@@ -1,0 +1,8 @@
+parametro,valor,descripción
+repositorio,C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\,ubicación del repositorio de documentos
+espera,10,segundos a esperar como máximo en cada busqueda de un objeto
+usuario,robot1,nombre del usuario en windows desde el que se está ejecutando el robot
+trimestre,ABR-JUN,trimestre a seleccionar
+user,123456,nombre del usuario de SIHO
+password,123456*,contraseña del usuario de SIHO
+base,SIHO.xlsx,nombre del archivo de base de datos
