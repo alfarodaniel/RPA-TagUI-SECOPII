@@ -123,10 +123,16 @@ for i in range(0, len(dfbase)):
     horainicio = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print('Paso 0: Acceder al contrato --- proceso',proceso,'-',horainicio,'--------------------------------------------------')
     mensaje(variables, 'Paso 0: Acceder al contrato --- proceso '+proceso+' - '+horainicio)
-        
-    # Paso 1: Modificar información del contrato
-    print('Paso 1: Modificar información del contrato --- proceso', proceso)
     
+    if dfbase.loc[i, 'observación'] in ['Actualizar solo fecha', 'Actualizar solo valor', 'Actualizar valor y fecha', 'Eliminar', 'Nuevo contrato']:
+        # Paso 1: Modificar información del contrato
+        print('Paso 1: Modificar información del contrato --- proceso', proceso)
+    else:
+        mensaje(variables, 'No existe el proceso: '+dfbase.loc[i, 'observación'])
+        print('No existe el proceso:', dfbase.loc[i, 'observación'])
+        print('Solo se permiten los procesos: "Actualizar solo fecha", "Actualizar solo valor", "Actualizar valor y fecha", "Eliminar" y "Nuevo contrato"')
+        continue
+
     if dfbase.loc[i, 'observación'] in ['Actualizar solo fecha', 'Actualizar solo valor', 'Actualizar valor y fecha']:
         if not buscar(variables, proceso): continue  # Buscar el contrato
         if dfbase.loc[i, 'observación'] == 'Actualizar solo fecha':
