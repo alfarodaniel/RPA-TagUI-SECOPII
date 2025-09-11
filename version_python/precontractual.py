@@ -58,6 +58,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'CreateProcedure_iframe', 'Frame CREAR PROCESO'): continue
     r.frame('CreateProcedure_iframe')
     if not esperar(r, variables, 'txtProcedureReference', 'Campo Número del proceso',frame='CreateProcedure_iframe'): continue
+    #r.wait(3)
     r.type('txtProcedureReference', '[clear]' + proceso) # Número de proceso
     r.type('txtProcedureName', '[clear]PRESTACION DE SERVICIOS PROFESIONALES Y APOYO A LA GESTION') # Nombre
     r.type('txtBusinessOperationText', '[clear]DIRECCIÓN DE CONTRATACIÓN') # Unidad de contratación
@@ -74,6 +75,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'txaDossierDescription', 'Campo Descripción'): continue
     r.type('txaDossierDescription', '[clear] PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
     # Clasificación del bien o servicio
+    #r.wait(3)
     r.click('divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText') # Código UNSPSC
     r.vision('type("85101600")') # Código UNSPSC
     r.wait(2)
@@ -86,6 +88,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'wndSearchPlannedAcquisitions_iframe', 'Frame CREAR PROCESO'): continue
     r.frame('wndSearchPlannedAcquisitions_iframe')
     if not esperar(r, variables, 'txtSearchAcquisitionTXT', 'Campo Descripción',frame='wndSearchPlannedAcquisitions_iframe'): continue
+    #r.wait(3)
     r.type('txtSearchAcquisitionTXT', '[clear]' + dfbase.loc[i, 'NOMBRE RUBRO']) # Campo Descripción
     r.type('rdbgType_1', 'Yes') # Radio button Todos
     r.vision('type(Key.SPACE)') # Radio button Todos
@@ -128,8 +131,8 @@ for i in range(0, len(dfbase)):
     r.click('rdbgProcessAssociatedWithSentenceT302Value_1') # Radio button No
     #r.wait(2)
     # Cronograma
-    r.type('dtmbContractSignatureDate_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 00:00') # Campo Fecha de firma del contrato
-    r.type('dtmbStartDateExecutionOfContract_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 00:00') # Campo Fecha de inicio de ejecución del contrato
+    r.type('dtmbContractSignatureDate_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de firma del contrato
+    r.type('dtmbStartDateExecutionOfContract_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de inicio de ejecución del contrato
     r.type('dtmbExecutionOfContractTerm_txt', dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Plazo de ejecución del contrato
     r.click('body')
     # Configuración financiera
@@ -188,7 +191,7 @@ for i in range(0, len(dfbase)):
     r.click('rdbgBudgetOriginCreditResourcesCheckValueP2Gen_1') # Recursos de Crédito Radio button No
     #r.wait(2)
     r.click('rdbgBudgetOriginOwnResourcesCheckValueP2Gen_1') # Otros Recursos Radio button No
-    #r.wait(2)
+    #r.wait(3)
     r.click('cbxOwnResourcesAGRIValue')
     r.vision('type(Key.DELETE)')
     r.vision(f'type("{dfbase.loc[i, 'VALOR CONTRATO']}")')
@@ -205,7 +208,8 @@ for i in range(0, len(dfbase)):
     r.vision('type(Key.SPACE)')
     if not esperar(r, variables, 'txtSIIFIntegrationItemTextbox', 'Campo Código'): continue
     #r.wait(3)
-    r.type('txtSIIFIntegrationItemTextbox', dfbase.loc[i, 'N° DEL CDP']) # Campo Código
+    r.type('txtSIIFIntegrationItemTextbox', 'Yes') # Campo Código
+    r.vision(f'type("{dfbase.loc[i, 'N° DEL CDP']}")') # Campo Código
     r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR DEL CDP']) # Campo Saldo
     r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Saldo a comprometer
     r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
@@ -270,7 +274,6 @@ for i in range(0, len(dfbase)):
     #r.wait(5)
     if not esperar(r, variables, '//input[@id="btnPublishRequest" and @title="Publicar"]', 'Botón Publicar'): continue
     r.click('btnPublishRequest') # Botón Publicar
-    #r.wait(5)
     if not esperar(r, variables, 'stpBuyerDossierInfoAnchor', 'Label Información general'): continue
     r.click('trRowToolbarTop_tdCell1_tbToolBar_lnkBack') # Botón Volver
     if not esperar(r, variables, 'btnFinishRequest', 'Botón Finalizar'): continue
