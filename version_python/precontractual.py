@@ -273,10 +273,16 @@ for i in range(0, len(dfbase)):
     r.click('btnOption_trRowToolbarTop_tdCell1_tbToolBar_Finish') # Botón Ir a publicar
     #r.wait(5)
     if not esperar(r, variables, '//input[@id="btnPublishRequest" and @title="Publicar"]', 'Botón Publicar'): continue
-    r.click('btnPublishRequest') # Botón Publicar
+    #r.click('btnPublishRequest') # Botón Publicar
+    r.wait(3)
+    r.type('btnPublishRequest', 'Yes') # Botón Publicar
+    r.vision('type(Key.ENTER)')
+    r.wait(5)
+    r.vision('type(Key.ENTER)')
     if not esperar(r, variables, 'stpBuyerDossierInfoAnchor', 'Label Información general'): continue
     r.click('trRowToolbarTop_tdCell1_tbToolBar_lnkBack') # Botón Volver
     if not esperar(r, variables, 'btnFinishRequest', 'Botón Finalizar'): continue
+    r.hover('btnFinishRequest') # Botón Finalizar
     r.click('btnFinishRequest') # Botón Finalizar
     #r.wait(2)
     if not esperar(r, variables, 'btnFinishRequestConfirmDialogModal', 'Botón Confirmar'): continue
