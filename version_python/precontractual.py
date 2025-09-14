@@ -282,8 +282,9 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'stpBuyerDossierInfoAnchor', 'Label Información general'): continue
     r.click('trRowToolbarTop_tdCell1_tbToolBar_lnkBack') # Botón Volver
     if not esperar(r, variables, 'btnFinishRequest', 'Botón Finalizar'): continue
-    r.hover('btnFinishRequest') # Botón Finalizar
-    r.click('btnFinishRequest') # Botón Finalizar
+    r.wait(5)
+    r.type('btnFinishRequest', 'Yes') # Botón Finalizar
+    r.vision('type(Key.ENTER)')
     #r.wait(2)
     if not esperar(r, variables, 'btnFinishRequestConfirmDialogModal', 'Botón Confirmar'): continue
     r.click('btnFinishRequestConfirmDialogModal') # Botón Confirmar
