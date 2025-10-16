@@ -65,10 +65,21 @@ for i in range(0, len(dfbase)):
         if r.present('btnSendToSupplier'):
             r.click('btnSendToSupplier') # Enviar al proveedor
             r.wait(5)
-    elif r.present('Enviar para aprobación ???????'):
+    elif r.present('btnOption_tbContractToolbar_FinishAfterAcknowledge'):
         # Paso 1: Aprobación por Enviar para aprobación
         print('Paso 1: Aprobación por Enviar para aprobación --- proceso', proceso)
-        print('Aprobación por Enviar para aprobación')
+        r.click('btnOption_tbContractToolbar_FinishAfterAcknowledge') # Boton Enviar para aprobación
+
+        # Frame Confirmar
+        r.frame('StartApprovalSupportModal_iframe')
+        if not esperar(r, variables, 'btnConfirmGen', 'Botón confirmar',frame='StartApprovalSupportModal_iframe'): continue
+        r.click('btnConfirmGen')
+        r.wait(5)
+        r.frame()
+
+        r.click('IncTaskApproval_btnApproveButton') # Boton Aprobar
+        r.wait(5)
+        
     else:
         print('Aprobación por Modificaciones del Contrato')
         # Paso 1: 8 Modificaciones del Contrato
