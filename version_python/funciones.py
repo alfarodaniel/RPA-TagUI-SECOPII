@@ -6,6 +6,7 @@ Funciones
 from pandas import read_csv
 from datetime import datetime
 import sys
+import re
 
 
 # Funcion para redirigir la salida estándar y de error a un archivo log.txt
@@ -153,4 +154,24 @@ def acceder_contrato(r, proceso, variables):
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
     if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
     r.click('lnkProcurementContractViewLink_0') # Referencia
+    return True
+
+
+# Función para anexar documento en SECOP II
+def anexar_documento(r, variables, dfbase, i):
+    # Popup ANEXAR DOCUMENTO
+    r.popup('DocumentAlternateUpload')
+    #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
+    if not esperar(r, variables, 'divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): return False
+    r.click('divAddFilesButton') # Boton Buscar documento
+    r.wait(5)
+    rutaarchivo = re.sub(r'\\+', r'\\', f'{variables["repositorio"]}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"]}')
+    r.vision(f'type("{rutaarchivo}")') # Ruta del documento
+    r.vision('type(Key.ENTER)')
+    r.wait(5)
+    r.click('btnUploadFilesButtonBottom') # Botón Anexar
+    if not esperar(r, variables, '//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): return False
+    r.click('btnCancelBottomButtom') # Botón Cerrar
+    r.popup(None) # Cierra el contexto del popup
+    r.wait(5)
     return True
