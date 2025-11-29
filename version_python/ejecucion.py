@@ -60,9 +60,9 @@ for i in range(0, len(dfbase)):
     r.wait(5)
 
     horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print('Terminada Aprobación del Contrato --- proceso', proceso, '-', horafin, '--------------------------------------------------')
-    mensaje(variables, 'Terminada Aprobación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
-    mensaje(variables, 'Aprobación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
+    print('Terminada Ejecución del Contrato --- proceso', proceso, '-', horafin, '--------------------------------------------------')
+    mensaje(variables, 'Terminada Ejecución del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+    mensaje(variables, 'Ejecución del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
 
 
 # Cerrar sesión
