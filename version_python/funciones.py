@@ -129,7 +129,7 @@ def cerrar(r):
 
 
 # Función para acceder al contrato en SECOP II
-def acceder_contrato(r, proceso, variables):
+def acceder_contrato(r, proceso, variables, contratos=1):
     if not esperar(r, variables, '//*[@value="Procesos"]', 'Paso 0: Menú desplegable Procesos'): return False
     r.click('//*[@value="Procesos"]') # Menú Procesos
     if not esperar(r, variables, '//*[@id="lnkSubItem6"]', 'Paso 0: Submenú Procesos de la Entidad Estatal'): return False
@@ -153,7 +153,10 @@ def acceder_contrato(r, proceso, variables):
     if not esperar(r, variables, '//*[@title="' + proceso + '"]', 'Paso 0: Titulo proceso'): return False
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
     if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
-    r.click('lnkProcurementContractViewLink_0') # Referencia
+    if contratos > 0:
+        r.click('lnkProcurementContractViewLink_0') # Referencia
+    else:
+        r.click('//*[@id="incBuyerDossierDetaillnkRequestReference"]') # Enlace proceso
     return True
 
 
