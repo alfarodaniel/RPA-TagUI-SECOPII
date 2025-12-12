@@ -151,6 +151,7 @@ def acceder_contrato(r, proceso, variables, contratos=1):
     #r.wait(1)
     r.click('btnSearchButton') # Botón Buscar
     if not esperar(r, variables, '//*[@title="' + proceso + '"]', 'Paso 0: Titulo proceso'): return False
+    r.hover('//*[@title="' + proceso + '"]') # Seleccionar el proceso
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
     if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
     if contratos > 0:
@@ -161,14 +162,14 @@ def acceder_contrato(r, proceso, variables, contratos=1):
 
 
 # Función para anexar documento en SECOP II
-def anexar_documento(r, variables, dfbase, i):
+def anexar_documento(r, variables, documento, i):
     # Popup ANEXAR DOCUMENTO
     r.popup('DocumentAlternateUpload')
     #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
     if not esperar(r, variables, 'divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): return False
     r.click('divAddFilesButton') # Boton Buscar documento
     r.wait(5)
-    rutaarchivo = re.sub(r'\\+', r'\\', f'{variables["repositorio"]}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"]}')
+    rutaarchivo = re.sub(r'\\+', r'\\', f'{variables["repositorio"]}documentos\\{documento}')
     r.vision(f'type("{rutaarchivo}")') # Ruta del documento
     r.vision('type(Key.ENTER)')
     r.wait(5)

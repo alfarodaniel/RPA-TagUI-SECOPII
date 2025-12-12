@@ -7,8 +7,7 @@ Modificación de información contracual en SECOP II de la información listada 
 import rpa as r
 from pandas import read_excel
 from datetime import datetime
-import re
-from funciones import redirigir_log, parametros, iniciar, cerrar, mensaje, esperar
+from funciones import redirigir_log, parametros, iniciar, cerrar, mensaje, esperar, acceder_contrato, anexar_documento
 
 #import os
 #os.chdir("C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\")
@@ -19,7 +18,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'precontractual_v1'
+variables['robot'] = 'precontractual_v2'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -35,11 +34,12 @@ iniciar(r, variables)
 # Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
-    #i=0
+    #i=1
     proceso = 'CPS-' + dfbase.loc[i, 'NUMERO DE CONTRATO'] + '-' + dfbase.loc[i, 'VIGENCIA']
 
     # Cargar página principal
     r.url('https://community.secop.gov.co/')
+
 
     # Paso 0: Crear proceso
     horainicio = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -68,15 +68,26 @@ for i in range(0, len(dfbase)):
     r.vision('type(Key.ENTER)')
     r.wait(2)
     r.type('btnSaveCurrentDossierTop', '[enter]') # Botón Confirmar
-    r.frame()
+    r.wait(2)
+    if r.exist('Ya existe un proceso con el mismo número.'):
+        print('El proceso ya existe, se inicia modificaión')
+        r.click('btnCloseGen') # Botón Cancelar
+        r.frame()
+        r.wait(2)
+        if not acceder_contrato(r, proceso, variables, contratos=0): continue
+    else:
+        r.frame()
+
 
     # Paso 1: 1 Información general
     print('Paso 1: 1 Información general', proceso)
+    if not esperar(r, variables, '//*[@id="stepDiv_1"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_1'): continue
     if not esperar(r, variables, 'txaDossierDescription', 'Campo Descripción'): continue
-    r.type('txaDossierDescription', '[clear] PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
+    r.type('txaDossierDescription', '[clear]PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
     # Clasificación del bien o servicio
     #r.wait(3)
-    r.click('divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText') # Código UNSPSC
+    r.click('//*[@id="divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText"]') # Campo Código UNSPSC
+    r.type('//*[@id="divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText"]', '[clear]') # Campo Código UNSPSC
     r.vision('type("85101600")') # Código UNSPSC
     r.wait(2)
     r.vision('type(Key.DOWN)')
@@ -117,19 +128,21 @@ for i in range(0, len(dfbase)):
         r.type('nbxDurationGen', dfbase.loc[i, 'MESES'])  # Ingresar meses si los días son 0
         r.select('selDurationTypeP2Gen', 2)  # Seleccionar tipo de duración en meses
     else:
-        r.type('nbxDurationGen', dfbase.loc[i, 'DIAS'])  # Campo Duración del contrato
+        r.type('nbxDurationGen', '[clear]' + dfbase.loc[i, 'DIAS'])  # Campo Duración del contrato
     r.type('dtmbContractEndDateGen_txt', '[clear]' + dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Descripción
     r.click('btnApproveDossier') # Botón Continuar
+    r.wait(2)
     
+
     # Paso 2: 2 Configuración
     print('Paso 2: 2 Configuración', proceso)
     # Decreto 248 de 2021
-    if not esperar(r, variables, '//*[@id="stepDiv_2"][@class="LeftMenuButtonOn Black"]', 'Menú 2 Configuración'): continue
+    if not esperar(r, variables, '//*[@id="stepDiv_2"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_2'): continue
     r.click('rdbgComplyWithMinimalPurchaseValue_1') # Radio button No
-    #r.wait(2)
+    r.wait(2)
     # Sentencia T-302 de 2017
     r.click('rdbgProcessAssociatedWithSentenceT302Value_1') # Radio button No
-    #r.wait(2)
+    r.wait(2)
     # Cronograma
     r.type('dtmbContractSignatureDate_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de firma del contrato
     r.type('dtmbStartDateExecutionOfContract_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de inicio de ejecución del contrato
@@ -218,6 +231,7 @@ for i in range(0, len(dfbase)):
     r.frame()
     r.wait(3)
 
+
     # Paso 3: 3 Cuestionario
     print('Paso 3: 3 Cuestionario', proceso)
     r.click('stepCircle_3') # stepCircle Cuestionario
@@ -225,16 +239,17 @@ for i in range(0, len(dfbase)):
     r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[3]/td[4]') # Lista de precios de la oferta 1+
     r.wait(5)
     r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input[1]') # Campo Código UNSPSC
+    r.type('//*[@id="incQuestionnaireCO1_BILN_1438700069_CategoryCode_LookupText"]','[clear]') # Código UNSPSC
     r.vision('type("85101600")') # Código UNSPSC
     r.wait(2)
     r.vision('type(Key.DOWN)')
     r.vision('type(Key.ENTER)')
     r.wait(2)
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[3]/input', dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input', '1') # Campo Cantidad
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input', dfbase.loc[i, 'VALOR CONTRATO'])
-    #r.click('btnSaveProcedureTop') # Botón Guardar
-    #r.wait(5)
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[3]/input', '[clear]' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input', '[clear]1') # Campo Cantidad
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input', '[clear]' + dfbase.loc[i, 'VALOR CONTRATO'])
+    r.click('btnSaveProcedureTop') # Botón Guardar
+    r.wait(5)
 
     """
     # Paso 4: Documentos del proceso
@@ -268,10 +283,11 @@ for i in range(0, len(dfbase)):
     r.wait(15)
     """
 
+
     # Paso 4: Publicar
     print('Paso 4: Publicar', proceso)
     r.click('btnOption_trRowToolbarTop_tdCell1_tbToolBar_Finish') # Botón Ir a publicar
-    #r.wait(5)
+    r.wait(5)
     if not esperar(r, variables, '//input[@id="btnPublishRequest" and @title="Publicar"]', 'Botón Publicar'): continue
     #r.click('btnPublishRequest') # Botón Publicar
     r.wait(3)
@@ -288,7 +304,7 @@ for i in range(0, len(dfbase)):
     #r.wait(2)
     if not esperar(r, variables, 'btnFinishRequestConfirmDialogModal', 'Botón Confirmar'): continue
     r.click('btnFinishRequestConfirmDialogModal') # Botón Confirmar
-    #r.wait(5)
+    r.wait(5)
     if not esperar(r, variables, '//input[@id="btnCreateContractButton" and @title="Crear"]', 'Botón Crear contrato'): continue
     r.click('btnCreateContractButton') # Botón Crear contrato
     
@@ -301,12 +317,13 @@ for i in range(0, len(dfbase)):
     r.frame()
     """
 
+
     # Paso 5: 1 Información general
     print('Paso 5: 1 Información general', proceso)
     # Identificacióndel contrato
     if not esperar(r, variables, 'txtContractReference1Gen', 'Campo Número del contrato'): continue
     r.type('txtContractReference1Gen', '[clear]' + proceso) # Campor Número de contrato
-    r.type('txaContractDescription1Gen', '[clear] PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Objeto del contrato
+    r.type('txaContractDescription1Gen', '[clear]PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Objeto del contrato
     r.click('rdbgLiquidationValue_1') # Liquidación Radio button No
     r.click('rdbgEnvironmentObligationValue_1') # Obligaciones Ambientales Radio button No
     r.click('rdbgPostConsumptionObligationValue_1') # Obligaciones por consumo Radio button No
@@ -318,7 +335,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'SelectAwardedSupplier_iframe', 'Frame Buscar entidad para seleccionar'): continue
     r.frame('SelectAwardedSupplier_iframe')
     if not esperar(r, variables, 'txtAllWords2Search', 'Campo Buscar',frame='SelectAwardedSupplier_iframe'): continue
-    #r.wait(3)
+    r.wait(3)
     r.type('txtAllWords2Search', dfbase.loc[i, 'DOCUMENTO DE IDENTIFICACION']) # Campo Buscar
     r.type('btnSearchCompanies', 'Yes') # Botón Buscar
     r.vision('type(Key.ENTER)')
@@ -330,6 +347,7 @@ for i in range(0, len(dfbase)):
     r.vision('type(Key.SPACE)')
     r.frame()
     r.wait(3)
+
 
     # Paso 6: 2 Condiciones
     print('Paso 6: 2 Condiciones', proceso)
@@ -346,22 +364,8 @@ for i in range(0, len(dfbase)):
     r.select('selPaymentTerm', 'A definir') # Lista desplegable Plazo de pago de la factura
     # Anexos del contrato
     r.click('btnUploadDocumentGen') # Botón Anexar documentos
-
-    # Popup ANEXAR DOCUMENTO
-    r.popup('DocumentAlternateUpload')
-    #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
-    if not esperar(r, variables, 'divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): continue
-    r.click('divAddFilesButton') # Boton Buscar documento
-    r.wait(5)
-    rutaarchivo = re.sub(r'\\+', r'\\', f'{variables["repositorio"]}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"]}.zip')
-    r.vision(f'type("{rutaarchivo}")') # Ruta del documento
-    r.vision('type(Key.ENTER)')
-    r.wait(5)
-    r.click('btnUploadFilesButtonBottom') # Botón Anexar
-    if not esperar(r, variables, '//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): continue
-    r.click('btnCancelBottomButtom') # Botón Cerrar
-    r.popup(None) # Cierra el contexto del popup
-    r.wait(5)
+    r.wait(3)
+    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"], i) # Popup ANEXAR DOCUMENTO
     
     # Municipio de ejecución del contrato
     r.click('btnAddLocationGenPC') # Botón Agregar ubicación
@@ -370,7 +374,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'LocationSelectView_iframe', 'Frame BUSCAR UBICACIÓN'): continue
     r.frame('LocationSelectView_iframe')
     if not esperar(r, variables, 'txtAddressSearchText', 'Campo Buscar',frame='LocationSelectView_iframe'): continue
-    #r.wait(3)
+    r.wait(3)
     r.type('txtAddressSearchText', 'Calle 66 # 15 - 41') # Campo Dirección
     r.type('txtZipCodeSearchText', '111221') # Campo Código postal
     r.type('btnSearchGen', 'Yes') # Botón Buscar
@@ -384,36 +388,30 @@ for i in range(0, len(dfbase)):
     r.frame()
     r.wait(3)
 
+
     # Paso 7: 3 Bienes y servicios
     print('Paso 7: 3 Bienes y servicios', proceso)
     r.click('stepCircle_3') # stepCircle Bienes y servicios
     if not esperar(r, variables, '//*[@id="stepDiv_3"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_3'): continue
     r.click('//*[@id="incCatalogueItemstblDataSheetContent"]/tbody/tr[2]/td/div[2]/table/tbody/tr[2]/td[4]') # Bienes y servicios 1+
     r.wait(5)
-    r.type('//*[@id="incCatalogueItemstblDataSheetContent"]/tbody/tr[2]/td/div[2]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Precio unitario
+    r.type('//*[@id="incCatalogueItemstblDataSheetContent"]/tbody/tr[2]/td/div[2]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', '[clear]') # Campo Precio unitario
+    #r.type('//*[@id="incCatalogueItemstblDataSheetContent"]/tbody/tr[2]/td/div[2]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Precio unitario
+    r.click('//*[@id="incCatalogueItemstblDataSheetContent"]/tbody/tr[2]/td/div[2]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input') # Campo Precio unitario
+    r.vision('type(Key.DELETE)')
+    r.vision(f'type("{dfbase.loc[i, 'VALOR CONTRATO']}")') # Campo Precio unitario
     
+
     # Paso 8: 5 Documentos del contrato
     print('Paso 8: 5 Documentos del contrato', proceso)
     r.click('stepCircle_5') # stepCircle Documentos del contrato
     if not esperar(r, variables, '//*[@id="stepDiv_5"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_5'): continue
     # Anexos del contrato
     r.click('btnUploadContractDocument') # Botón Anexar documentos
-
-    # Popup ANEXAR DOCUMENTO
-    r.popup('DocumentAlternateUpload')
-    if not esperar(r, variables, 'divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload'): continue
-    r.click('divAddFilesButton') # Boton Buscar documento
-    r.wait(5)
-    rutaarchivo = re.sub(r'\\+', r'\\', f'{variables["repositorio"]}documentos\\{dfbase.loc[i, "NOMBRE_DOCUMENTO"]}.zip')
-    r.vision(f'type("{rutaarchivo}")') # Ruta del documento
-    r.vision('type(Key.ENTER)')
-    r.wait(5)
-    r.click('btnUploadFilesButtonBottom') # Botón Anexar
-    if not esperar(r, variables, '//*[@id="tblFilesTable"]//*[@processed="success"]', 'Progreso DOCUMENTO ANEXO'): continue
-    r.click('btnCancelBottomButtom') # Botón Cerrar
-    r.popup(None) # Cierra el contexto del popup
-    r.wait(5)
-
+    r.wait(3)
+    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO"], i) # Popup ANEXAR DOCUMENTO
+    
+    
     # Paso 9: Confirmar
     print('Paso 9: Confirmar', proceso)
     r.click('btnOption_tbContractToolbar_Finish') # Botón Confirmar
