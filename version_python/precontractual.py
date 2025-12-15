@@ -34,7 +34,7 @@ iniciar(r, variables)
 # Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
-    #i=1
+    #i=0
     proceso = 'CPS-' + dfbase.loc[i, 'NUMERO DE CONTRATO'] + '-' + dfbase.loc[i, 'VIGENCIA']
 
     # Cargar página principal

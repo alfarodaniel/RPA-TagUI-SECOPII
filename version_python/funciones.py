@@ -138,6 +138,7 @@ def acceder_contrato(r, proceso, variables, contratos=1):
     r.click('lnkAdvancedSearchLink') # Campo Búsqueda avanzada
     #r.wait(30)
     if not esperar(r, variables, '//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]', 'Paso 0: Menú desplegable Mis procesos'): return False
+    r.wait(5)
     r.click('//*[@id="selFilteringStatesSel_msdd"]//*[@class="ddArrow arrowoff"]') # Menú desplegable Mis procesos
     #r.vision('type(Key.UP)') # Subir una opción a Todos
     #r.vision('type(Key.ENTER)') # Seleccionar Todos
@@ -151,12 +152,14 @@ def acceder_contrato(r, proceso, variables, contratos=1):
     #r.wait(1)
     r.click('btnSearchButton') # Botón Buscar
     if not esperar(r, variables, '//*[@title="' + proceso + '"]', 'Paso 0: Titulo proceso'): return False
-    r.hover('//*[@title="' + proceso + '"]') # Seleccionar el proceso
+    #r.hover('//*[@title="' + proceso + '"]') # Seleccionar el proceso
+    r.wait(5)
     r.click('//*[@title="' + proceso + '"]') # Seleccionar el proceso
-    if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
     if contratos > 0:
+        if not esperar(r, variables, 'incBuyerDossierDetaillnkBuyerDossierDetailLink', 'Paso 0: Boton Detalle'): return False
         r.click('lnkProcurementContractViewLink_0') # Referencia
     else:
+        if not esperar(r, variables, '//*[@id="incBuyerDossierDetaillnkRequestReference"]', 'Paso 0: Enlace contrato'): return False
         r.click('//*[@id="incBuyerDossierDetaillnkRequestReference"]') # Enlace proceso
     return True
 
