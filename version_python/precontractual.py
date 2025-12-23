@@ -2,7 +2,7 @@
 Automatizar SECOP II aprobación
 Modificación de información contracual en SECOP II de la información listada en el archivo "Base_de_datos_Contratacion.xlsx"
 """
-
+# %% Cargar datos
 # Cargar librerías
 import rpa as r
 from pandas import read_excel
@@ -31,7 +31,7 @@ r.init(visual_automation = True, turbo_mode=False)
 # Iniciar sesion
 iniciar(r, variables)
 
-# Recorrer la base de datos
+# %% Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
     #i=0
@@ -144,9 +144,9 @@ for i in range(0, len(dfbase)):
     r.click('rdbgProcessAssociatedWithSentenceT302Value_1') # Radio button No
     r.wait(2)
     # Cronograma
-    r.type('dtmbContractSignatureDate_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de firma del contrato
-    r.type('dtmbStartDateExecutionOfContract_txt', dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de inicio de ejecución del contrato
-    r.type('dtmbExecutionOfContractTerm_txt', dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Plazo de ejecución del contrato
+    r.type('dtmbContractSignatureDate_txt', '[clear]' + dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de firma del contrato
+    r.type('dtmbStartDateExecutionOfContract_txt', '[clear]' + dfbase.loc[i, 'FECHA_INICIO'] + ' 23:59') # Campo Fecha de inicio de ejecución del contrato
+    r.type('dtmbExecutionOfContractTerm_txt', '[clear]' + dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Plazo de ejecución del contrato
     r.click('body')
     # Configuración financiera
     if dfbase.loc[i, 'SOLICITUD_DE_GARANTIAS'] == "Si":
@@ -185,26 +185,26 @@ for i in range(0, len(dfbase)):
     r.wait(5)
     """
     # Precios
-    r.type('cbxBasePrice', dfbase.loc[i, 'VALOR CONTRATO']) # Campo Valor estimado
+    r.type('cbxBasePrice', '[clear]' + dfbase.loc[i, 'VALOR CONTRATO']) # Campo Valor estimado
     r.click('body')
-    r.wait(3)
+    r.wait(5)
     # Información presupuestal
     r.click('rdbgFrameworkAgreementValue_1') # Implementación del Acuerdo de Paz Radio button No
-    #r.wait(5)
+    r.wait(5)
     r.select('selExpenseTypeSelect', '0') # Lista desplegable Destinación del gasto
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginGNBCheckValueP2Gen_1') # Presupuesto General PGN Radio button No
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginGSPCheckValueP2Gen_1') # Sistema General SGP Radio button No
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginGRSCheckValueP2Gen_1') # Sistema General SGR Radio button No
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginOwnResourcesAGRICheckValueP2Gen_0') # Recursos Propios Radio button Si
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginCreditResourcesCheckValueP2Gen_1') # Recursos de Crédito Radio button No
-    #r.wait(2)
+    r.wait(2)
     r.click('rdbgBudgetOriginOwnResourcesCheckValueP2Gen_1') # Otros Recursos Radio button No
-    #r.wait(3)
+    r.wait(2)
     r.click('cbxOwnResourcesAGRIValue')
     r.vision('type(Key.DELETE)')
     r.vision(f'type("{dfbase.loc[i, 'VALOR CONTRATO']}")')
@@ -220,7 +220,7 @@ for i in range(0, len(dfbase)):
     r.type('rdbgOptionsToSelectRadioButton_0', 'Yes') # Radio button CDP
     r.vision('type(Key.SPACE)')
     if not esperar(r, variables, 'txtSIIFIntegrationItemTextbox', 'Campo Código'): continue
-    #r.wait(3)
+    r.wait(3)
     r.type('txtSIIFIntegrationItemTextbox', 'Yes') # Campo Código
     r.vision(f'type("{dfbase.loc[i, 'N° DEL CDP']}")') # Campo Código
     r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR DEL CDP']) # Campo Saldo
@@ -228,6 +228,11 @@ for i in range(0, len(dfbase)):
     r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
     r.type('btnSIIFIntegrationItemButton', 'Yes') # Botón Crear
     r.vision('type(Key.ENTER)')
+    r.wait(3)
+    if r.exist('Este código ya existe para este tipo de información presupuestal'):
+        print('El código ya existe, se omite')
+        r.type('btnSIIFIntegrationItemCancelButton', 'Yes') # Botón Cancelar
+        r.vision('type(Key.ENTER)')
     r.frame()
     r.wait(3)
 
@@ -239,15 +244,23 @@ for i in range(0, len(dfbase)):
     r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[3]/td[4]') # Lista de precios de la oferta 1+
     r.wait(5)
     r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input[1]') # Campo Código UNSPSC
-    r.type('//*[@id="incQuestionnaireCO1_BILN_1438700069_CategoryCode_LookupText"]','[clear]') # Código UNSPSC
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input[1]','[clear]') # Código UNSPSC
     r.vision('type("85101600")') # Código UNSPSC
     r.wait(2)
     r.vision('type(Key.DOWN)')
     r.vision('type(Key.ENTER)')
     r.wait(2)
     r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[3]/input', '[clear]' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input', '[clear]1') # Campo Cantidad
-    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input', '[clear]' + dfbase.loc[i, 'VALOR CONTRATO'])
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input', '[clear]') # Campo Cantidad
+    r.click('body')
+    r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[4]/input') # Campo Cantidad
+    r.vision('type("1")')
+    r.click('body')
+    r.type('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input', '[clear]')
+    r.click('body')
+    r.click('//*[@id="incQuestionnairefltDataSheet"]/table/tbody/tr[7]/td[5]/table/tbody/tr/td[2]/table/tbody/tr[1]/td[6]/input') # Campo Precio unitario estimado
+    r.vision(f'type("{dfbase.loc[i, "VALOR CONTRATO"]}")')
+    r.click('body')
     r.click('btnSaveProcedureTop') # Botón Guardar
     r.wait(5)
 
