@@ -3,6 +3,7 @@ Automatizar SECOP II contractual
 Modificación de información contracual en SECOP II de la información listada en el archivo "Base_de_datos_Contratacion.xlsx"
 """
 
+# %% Cargar datos
 # Cargar librerías
 import rpa as r
 from pandas import read_excel
@@ -31,7 +32,7 @@ r.init(visual_automation = True, turbo_mode=False)
 # Iniciar sesion
 iniciar(r, variables)
 
-# Recorrer la base de datos
+# %% Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
     #i=0
