@@ -97,7 +97,7 @@ for i in range(0, len(dfbase)):
     # Anexos del contrato
     r.click('btnUploadDocumentGen') # Botón Anexar documentos
     r.wait(3)
-    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"], i) # Popup ANEXAR DOCUMENTO
+    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"]) # Popup ANEXAR DOCUMENTO
     
     # Municipio de ejecución del contrato
     r.click('btnAddLocationGenPC') # Botón Agregar ubicación
@@ -141,7 +141,7 @@ for i in range(0, len(dfbase)):
     # Anexos del contrato
     r.click('btnUploadContractDocument') # Botón Anexar documentos
     r.wait(3)
-    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO"], i) # Popup ANEXAR DOCUMENTO
+    anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO"]) # Popup ANEXAR DOCUMENTO
     
     
     # Paso 5: Confirmar

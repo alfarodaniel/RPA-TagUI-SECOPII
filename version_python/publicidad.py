@@ -3,6 +3,7 @@ Automatizar SECOP II ejecución
 Anexar documento de publicidad en SECOP II de la información listada en el archivo "Base_de_datos_Contratacion.csv"
 """
 
+# %% Cargar datos
 # Cargar librerías
 import rpa as r
 from pandas import read_excel
@@ -31,7 +32,7 @@ r.init(visual_automation = True, turbo_mode=False)
 # Iniciar sesion
 iniciar(r, variables)
 
-# Recorrer la base de datos
+# %% Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
     #i=0
@@ -65,13 +66,14 @@ for i in range(0, len(dfbase)):
     #r.wait(5)
     r.click('incContractDocumentsbtnUploadDocumentGen') # Botón Anexar documento
     r.wait(5)
-  
+    
     # Popup ANEXAR DOCUMENTO
-    if not anexar_documento(r, variables, dfbase, i): continue
+    if not anexar_documento(r, variables, dfbase.loc[i, "NOMBRE_DOCUMENTO_ANEXO"]): continue
     r.wait(5)
 
     r.click('btnOption_trRowToolbarTop_tdCell1_tbToolBar_Finish') # Botón Realizar modificación
     if not esperar(r, variables, '//*[@id="btnApplyAmendment"]', 'Paso 3: Botón Aplicar la modificación'): continue
+    r.wait(5)
     r.click('//*[@id="btnApplyAmendment"]') # Botón Aplicar la modificación
     r.wait(5)
 

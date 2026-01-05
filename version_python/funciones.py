@@ -165,7 +165,7 @@ def acceder_contrato(r, proceso, variables, contratos=1):
 
 
 # Función para anexar documento en SECOP II
-def anexar_documento(r, variables, documento, i):
+def anexar_documento(r, variables, documento):
     # Popup ANEXAR DOCUMENTO
     r.popup('DocumentAlternateUpload')
     #esperar('divAddFilesButton', 'Boton Buscar documento', popup='DocumentAlternateUpload')
