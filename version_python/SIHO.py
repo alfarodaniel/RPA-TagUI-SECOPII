@@ -3,7 +3,7 @@ Automatizar registro del Sistema de Información Hospitalario - SIHO
 Modificación de información en SIHO de la información listada en el archivo "SIHO.xlsx"
 """
 
-# Cargar librerías
+#%% Cargar librerías
 import rpa as r
 from pandas import read_csv, read_excel, to_datetime
 from datetime import datetime
@@ -67,13 +67,14 @@ variables = {
     'repositorio': params.get('repositorio'),
     'espera': int(params.get('espera')),
     'usuario': params.get('usuario'),
+    'ano': params.get('ano'),
     'trimestre': params.get('trimestre'),
     'user': params.get('user'),
     'password': params.get('password'),
     'base': params.get('base'),
     'contrato': ''
 }
-variables['robot'] = 'SIHO_v1'
+variables['robot'] = 'SIHO_v2'
 variables['pagina'] = 'https://prestadores.minsalud.gov.co/SIHO/formularios/contratacion.aspx?pageTitle=Contrataci%f3n%20desde%202020&pageHlp=/SIHO/ayudas/formularios/contrataciones.pdf&periodo=TRIMESTRAL'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
@@ -81,7 +82,7 @@ dfbase = read_excel(variables['base'], dtype=str)
 dfbase['fecha_inicio_contrato'] = to_datetime(dfbase['fecha_inicio_contrato']).dt.strftime('%Y/%m/%d') # Formatear fecha
 dfbase['fecha_final_contrato'] = to_datetime(dfbase['fecha_final_contrato']).dt.strftime('%Y/%m/%d') # Formatear fecha
 
-# Iniciar robot
+#%% Iniciar robot
 print('Iniciar robot', variables['robot'])
 #r.init(visual_automation = True, turbo_mode=False)
 r.init(visual_automation = False, turbo_mode=True)
@@ -107,13 +108,14 @@ r.wait(2)
 # Abrir PARÁMETROS DE CAPTURA DE FORMULARIOS
 r.url('https://prestadores.minsalud.gov.co/siho/formularios/contratacionperiodo.aspx?pageTitle=Contrataci%F3n%20desde%202020&pageHlp=/SIHO/ayudas/formularios/contrataciones.pdf')
 
-# Selección Periodo
+# Selección Año Periodo
 esperar(r, variables, '//*[@id="ddmes"]', 'Selección Periodo') # Selección Periodo
+r.select('//*[@id="ddano"]', variables['ano']) # Selección Año
 r.select('//*[@id="ddmes"]', variables['trimestre']) # Selección Trimestre
 r.click('//*[@id="ibAceptar"]') # Botón Aceptar
 
 
-# Recorrer la base de datos
+#%% Recorrer la base de datos
 for i in range(0, len(dfbase)):
     # Variables
     #i=0
