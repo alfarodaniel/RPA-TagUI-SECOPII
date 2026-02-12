@@ -18,7 +18,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'precontractual_v2'
+variables['robot'] = 'precontractual_v3'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -83,7 +83,7 @@ for i in range(0, len(dfbase)):
     print('Paso 1: 1 Información general', proceso)
     if not esperar(r, variables, '//*[@id="stepDiv_1"][@class="LeftMenuButtonOn Black"]', 'stepCircle Configuracion en negro', stepCircle='stepCircle_1'): continue
     if not esperar(r, variables, 'txaDossierDescription', 'Campo Descripción'): continue
-    r.type('txaDossierDescription', '[clear]PRESTAR SERVICIOS PROFESIONALES Y DE APOYO A LA GESTIÓN COMO ' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
+    r.type('txaDossierDescription', '[clear]' + dfbase.loc[i, 'PERFIL (PROFESION)']) # Campo Descripción
     # Clasificación del bien o servicio
     #r.wait(3)
     r.click('//*[@id="divCategorizationRow_incDossierCategorizationUnspscMain_0_Lookup_LookupText"]') # Campo Código UNSPSC
@@ -99,7 +99,7 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'wndSearchPlannedAcquisitions_iframe', 'Frame CREAR PROCESO'): continue
     r.frame('wndSearchPlannedAcquisitions_iframe')
     if not esperar(r, variables, 'txtSearchAcquisitionTXT', 'Campo Descripción',frame='wndSearchPlannedAcquisitions_iframe'): continue
-    #r.wait(3)
+    r.wait(3)
     r.type('txtSearchAcquisitionTXT', '[clear]' + dfbase.loc[i, 'NOMBRE RUBRO']) # Campo Descripción
     r.type('rdbgType_1', 'Yes') # Radio button Todos
     r.vision('type(Key.SPACE)') # Radio button Todos
@@ -124,11 +124,13 @@ for i in range(0, len(dfbase)):
     if not esperar(r, variables, 'selJustificationTypeOfContractSelected', 'Lista desplegable Justificación de la modalidad de contratación'): continue
     r.select('selJustificationTypeOfContractSelected', 'ApplicableRule') # Lista desplegable Justificación de la modalidad de contratación
     # Verificar la Duración estimada del contrato
+    r.wait(2)
     if dfbase.loc[i, 'DIAS'] == '0':
         r.type('nbxDurationGen', dfbase.loc[i, 'MESES'])  # Ingresar meses si los días son 0
         r.select('selDurationTypeP2Gen', 2)  # Seleccionar tipo de duración en meses
     else:
         r.type('nbxDurationGen', '[clear]' + dfbase.loc[i, 'DIAS'])  # Campo Duración del contrato
+    r.wait(2)
     r.type('dtmbContractEndDateGen_txt', '[clear]' + dfbase.loc[i, 'FECHA_TERMINACION'] + ' 23:59') # Campo Descripción
     r.click('btnApproveDossier') # Botón Continuar
     r.wait(2)
@@ -185,6 +187,8 @@ for i in range(0, len(dfbase)):
     r.wait(5)
     """
     # Precios
+    r.type('cbxBasePrice', '[clear]') # Campo Valor estimado
+    r.wait(2)
     r.type('cbxBasePrice', '[clear]' + dfbase.loc[i, 'VALOR CONTRATO']) # Campo Valor estimado
     r.click('body')
     r.wait(5)
