@@ -179,8 +179,8 @@ for i in range(0, len(dfbase)):
     
     horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print('Terminada Modificación del Contrato --- proceso', proceso, '-', horafin, '--------------------------------------------------')
-    mensaje('Terminada Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
-    mensaje('Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
+    mensaje(variables, 'Terminada Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+    mensaje(variables, 'Modificación del Contrato --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
 
 # Cerrar sesión
 cerrar(r)
