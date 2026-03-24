@@ -54,7 +54,7 @@ for i in range(0, len(dfbase)):
         respuesta.raise_for_status() # Lanza error si la descarga falla
         
         # Manejo del ZIP (Modo 'a' para agregar o crear si no existe)
-        with zipfile.ZipFile(id_funcionario_zip, mode='a', compression=zipfile.ZIP_DEFLATED) as zf:
+        with zipfile.ZipFile(variables['repositorio'] +'\\documentos\\' + id_funcionario_zip, mode='a', compression=zipfile.ZIP_DEFLATED) as zf:
             # Escribimos el contenido descargado en el zip con el nombre deseado
             zf.writestr(nombre_pdf, respuesta.content)
             
