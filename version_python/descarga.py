@@ -42,12 +42,12 @@ for i in range(0, len(dfbase)):
     url_drive_id = dfbase.loc[i, 'ENLACE'].split('=')[-1]
     direct_download_url = f'https://drive.google.com/uc?export=download&id={url_drive_id}'
     nombre_pdf = dfbase.loc[i, 'NOMBRE DE ARCHIVO'] + '.pdf'
-    proceso = 'Descarga ' + nombre_pdf
+    proceso = nombre_pdf
 
     # Paso 1: Descargar archivo
     horainicio = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print('Paso 1: ',proceso,'-',horainicio,'--------------------------------------------------')
-    mensaje(variables, 'Paso 1: '+proceso+' - '+horainicio)
+    print('Paso 1: Descarga --- proceso',proceso,'-',horainicio,'--------------------------------------------------')
+    mensaje(variables, 'Paso 1: Descarga --- proceso '+proceso+' - '+horainicio)
     try:
         # Descargar el PDF en memoria
         respuesta = requests.get(direct_download_url)
@@ -59,9 +59,9 @@ for i in range(0, len(dfbase)):
             zf.writestr(nombre_pdf, respuesta.content)
             
         horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print('Terminada ', proceso, '-', horafin, '--------------------------------------------------')
-        mensaje(variables, 'Terminada '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
-        mensaje(variables, proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
+        print('Terminada Descarga --- proceso', proceso, '-', horafin, '--------------------------------------------------')
+        mensaje(variables, 'Terminada Descarga --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+        mensaje(variables, 'Descarga --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
         
     except Exception as e:
         print(f"  ✗ Error al procesar {nombre_pdf}: {e}")
