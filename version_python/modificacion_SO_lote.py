@@ -84,6 +84,7 @@ for i in range(0, len(dfbase)):
     # Frame TIPO DE MODIFICACION
     #if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
     r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
+    #if not esperar(r, variables, 'btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
     if not esperar(r, variables, 'btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
     #r.click('body')
     #r.click('//*[@id="chkBypassWorkflowCheck"]') # Checkbox ¿Requiere reconocimiento del proveedor?
