@@ -19,7 +19,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'modificación_v2'
+variables['robot'] = 'modificación_v3'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -61,7 +61,7 @@ for i in range(0, len(dfbase)):
     else:
         r.click('//*[@id="btnMakeModification"]') # Botón Modificar
     
-
+    
     # Paso 2: 1 Modificación del Contrato
     print('Paso 2: 1 Modificación del Contrato --- proceso', proceso)
     if not esperar(r, variables, 'lnkModifyContractGeneralLink', 'Enlace Modificar el contrato'): continue
@@ -70,7 +70,8 @@ for i in range(0, len(dfbase)):
     # Frame TIPO DE MODIFICACION
     #if not esperar('ProcurementContractModificationConfirmCreateTypeModal_iframe', 'Frame TIPO DE MODIFICACION'): continue
     r.frame('ProcurementContractModificationConfirmCreateTypeModal_iframe')
-    if not esperar(r, variables, 'btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
+    ##if not esperar(r, variables, 'btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe'): continue
+    esperar(r, variables, 'btnConfirmGen', 'Campo Número del proceso',frame='ProcurementContractModificationConfirmCreateTypeModal_iframe')
     #r.click('body')
     r.click('//*[@id="chkBypassWorkflowCheck"]')
     r.wait(1)
