@@ -19,7 +19,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'modificación_v3'
+variables['robot'] = 'modificación_v4'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -87,7 +87,7 @@ for i in range(0, len(dfbase)):
 
 
     # Paso 3: 2 Información general
-    if dfbase.loc[i, 'TIPO_MODIFICACION'] == 'ADICION - PRORROGA':
+    if dfbase.loc[i, 'TIPO_MODIFICACION'] in ['ADICION - PRORROGA', 'PRORROGA']:
         print('Paso 3: 2 Información general --- proceso', proceso)
         r.click('stepCircle_2') # Información general
         if not esperar(r, variables, '//*[@id="stepCircleSelected_2"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_2'): continue
@@ -95,7 +95,7 @@ for i in range(0, len(dfbase)):
 
 
     # Paso 4: 3 Condiciones
-    if dfbase.loc[i, 'TIPO_MODIFICACION'] == 'ADICION - PRORROGA':
+    if dfbase.loc[i, 'TIPO_MODIFICACION'] in ['ADICION - PRORROGA', 'PRORROGA']:
         print('Paso 4: 3 Condiciones --- proceso', proceso)
         r.click('stepCircle_3') # Información general
         if not esperar(r, variables, '//*[@id="stepCircleSelected_3"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_3'): continue
@@ -103,41 +103,43 @@ for i in range(0, len(dfbase)):
 
 
     # Paso 5: 4 Bienes y Servicios
-    print('Paso 5: 4 Bienes y Servicios --- proceso', proceso)
-    r.click('stepCircle_4') # Bienes y Servicios
-    if not esperar(r, variables, '//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_4'): continue
-    r.click('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[2]/td[4]') # Símbolo + en Incluya el precio como lo indique la Entidad Estatal
-    if not esperar(r, variables, '//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', 'Campo Precio unitario'): continue
-    r.dclick('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input') # Campo Precio unitario
-    r.type('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR TOTAL']) # Campo Precio unitario
+    if dfbase.loc[i, 'TIPO_MODIFICACION'] in ['ADICION', 'ADICION - PRORROGA']:
+        print('Paso 5: 4 Bienes y Servicios --- proceso', proceso)
+        r.click('stepCircle_4') # Bienes y Servicios
+        if not esperar(r, variables, '//*[@id="stepCircleSelected_4"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_4'): continue
+        r.click('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[2]/td[4]') # Símbolo + en Incluya el precio como lo indique la Entidad Estatal
+        if not esperar(r, variables, '//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', 'Campo Precio unitario'): continue
+        r.dclick('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input') # Campo Precio unitario
+        r.type('//*[@id="incCatalogueItemsfltDataSheet"]/table/tbody/tr[5]/td[5]/table/tbody/tr/td/table/tbody/tr[1]/td[7]/input', dfbase.loc[i, 'VALOR TOTAL']) # Campo Precio unitario
 
 
     # Paso 6: 7 Informacion presupuestal
-    print('Paso 6: 7 Información presupuestal --- proceso', proceso)
-    r.click('stepCircle_7') # Informacion presupuestal
-    if not esperar(r, variables, '//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_7'): continue
-    if not esperar(r, variables, 'cbxOwnResourcesAGRIValue', 'Campo Recursos Propios'): continue
-    r.dclick('cbxOwnResourcesAGRIValue') # Campo Recursos Propios
-    r.type('cbxOwnResourcesAGRIValue', dfbase.loc[i, 'VALOR TOTAL']) # Campo Recursos Propios
-    if not esperar(r, variables, '//*[@id="SIIFModal_iframe"]', 'Frame Información presupuestal',boton='btnAddCode'): continue
-    #r.click('btnAddCode') # Botón Agregar de CDP/Vigencias Futuras
+    if dfbase.loc[i, 'TIPO_MODIFICACION'] in ['ADICION', 'ADICION - PRORROGA']:
+        print('Paso 6: 7 Información presupuestal --- proceso', proceso)
+        r.click('stepCircle_7') # Informacion presupuestal
+        if not esperar(r, variables, '//*[@id="stepCircleSelected_7"][@class="MainColor4 circle22 Black stepOn"]', 'stepCircle Configuracion en negro',stepCircle='stepCircle_7'): continue
+        if not esperar(r, variables, 'cbxOwnResourcesAGRIValue', 'Campo Recursos Propios'): continue
+        r.dclick('cbxOwnResourcesAGRIValue') # Campo Recursos Propios
+        r.type('cbxOwnResourcesAGRIValue', dfbase.loc[i, 'VALOR TOTAL']) # Campo Recursos Propios
+        if not esperar(r, variables, '//*[@id="SIIFModal_iframe"]', 'Frame Información presupuestal',boton='btnAddCode'): continue
+        #r.click('btnAddCode') # Botón Agregar de CDP/Vigencias Futuras
 
-    # Frame Información presupuestal
-    r.frame('SIIFModal_iframe')
-    #esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
-    if not esperar(r, variables, '//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): continue
-    #r.wait(3)
-    r.type('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Yes') # Radio button CDP
-    r.vision('type(Key.SPACE)') # Radio button CDP
-    r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código 
-    r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') # Campo Código
-    #r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Saldo
-    r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Valor a utilizar
-    r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
-    r.type('btnSIIFIntegrationItemButton', 'yes') # Botón Crear
-    #r.type('btnSIIFIntegrationItemCancelButton', 'yes') # Botón Cancelar
-    r.vision('type(Key.SPACE)') # Botón Crear
-    r.frame()
+        # Frame Información presupuestal
+        r.frame('SIIFModal_iframe')
+        #esperar('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe')
+        if not esperar(r, variables, '//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Radio button CDP',frame='SIIFModal_iframe'): continue
+        #r.wait(3)
+        r.type('//*[@id="rdbgOptionsToSelectRadioButton_0"]', 'Yes') # Radio button CDP
+        r.vision('type(Key.SPACE)') # Radio button CDP
+        r.type('txtSIIFIntegrationItemTextbox', '[clear]') # Campo Código 
+        r.vision(f'type("{dfbase.loc[i, 'CDP_1']}")') # Campo Código
+        #r.type('cbxSIIFIntegrationItemBalanceTextbox', dfbase.loc[i, 'VALOR TOTAL']) # Campo Saldo
+        r.type('cbxSIIFIntegrationItemUsedValueTextbox', dfbase.loc[i, 'ADICION_VALOR']) # Campo Valor a utilizar
+        r.type('txtSIIFIntegrationItemPCICodebox', dfbase.loc[i, 'CODIGO RUBRO']) # Campo Código unidad ejecutora
+        r.type('btnSIIFIntegrationItemButton', 'yes') # Botón Crear
+        #r.type('btnSIIFIntegrationItemCancelButton', 'yes') # Botón Cancelar
+        r.vision('type(Key.SPACE)') # Botón Crear
+        r.frame()
     
 
     # Paso 7: 1 Modificación del Contrato
