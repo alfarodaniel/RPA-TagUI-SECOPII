@@ -51,8 +51,9 @@ r.url('https://infolab.subrednorte.gov.co/REDNORTE/login.aspx')
 
 # Iniciar sesion
 esperar(r, variables, '//*[@id="SECTION4"]/input', 'Botón Iniciar Sesión')
-r.type('//*[@id="vUSUARIOLOGIN"]', '[clear]medico') # Celda 'Usuario'
-r.type('//*[@id="vUSUARIOPASSWORD"]', '[clear]123') # Celda 'Contraseña'
+r.type('//*[@id="vUSUARIOLOGIN"]', '[clear]' + variables['user']) # Celda 'Usuario'
+r.type('//*[@id="vUSUARIOPASSWORD"]', '[clear]' + variables['password']) # Celda 'Contraseña'
+r.select('//*[@id="vUSUARIOLABORATORIO"]', 'BUENAVISTA') # Lista despelgable 'Seleccionar laboratorio'
 r.click('//*[@id="SECTION4"]/input') # Botón 'Iniciar Sesión'
 
 
@@ -193,7 +194,7 @@ for i in range(0, len(dfbase)):
     if not r.present('//*[@id="vIMGATENCION_0001"]'):
         dfbase.loc[i, 'Estado'] = 'Sin Historia'
         print('Sin Historia --- proceso '+proceso)
-        mensaje(variables, 'Sin Historia --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+        mensaje(variables, 'Sin Historia')
         # Actualizar archivo
         dfbase.loc[i, 'Estado'] = 'Sin Historia'
         dfbase.to_excel(variables['base'], index=False)
@@ -273,9 +274,9 @@ for i in range(0, len(dfbase)):
 
 
     horafin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print('Terminada Descarga de Laboratorios ' + str(n) + ' --- proceso', proceso, '-', horafin, '--------------------------------------------------')
-    mensaje(variables, 'Terminada Descarga de Laboratorios ' + str(n) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
-    mensaje(variables, 'Descarga de Laboratorios ' + str(n) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
+    print('Terminada Descarga de Laboratorios ' + str(n-1) + ' --- proceso', proceso, '-', horafin, '--------------------------------------------------')
+    mensaje(variables, 'Terminada Descarga de Laboratorios ' + str(n-1) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
+    mensaje(variables, 'Descarga de Laboratorios ' + str(n-1) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
     # Actualizar archivo
     dfbase.loc[i, 'Estado'] = 'Descargadas ' + str(n)
     dfbase.to_excel(variables['base'], index=False)
