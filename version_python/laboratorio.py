@@ -165,7 +165,7 @@ def comprimir_pdf(pdf,
     
 # %% Recorrer la base de datos
 for i in range(0, len(dfbase)):
-    # Reiniciar robot cada 50 iteraciones
+    # Reiniciar robot cada 50 iteraciones para prevenir bloqueo de la página
     if i%10 == 0 and i > 0:
         # Cerrar sesion
         r.click('//*[@id="CUSTOMMENU_MPAGE"]/ul/li/a/span') # Menú Usuario
