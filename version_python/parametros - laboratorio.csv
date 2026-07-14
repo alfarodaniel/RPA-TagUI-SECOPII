@@ -1,7 +1,0 @@
-parametro,valor,descripción
-repositorio,C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\,ubicación del repositorio de documentos
-espera,10,segundos a esperar como máximo en cada busqueda de un objeto
-usuario,robot1,nombre del usuario en windows desde el que se está ejecutando el robot
-user,7,nombre del usuario de SECOP II
-password,S,contraseña del usuario de SECOP II
-base,Base_descargas_HC.xlsx,nombre del archivo de base de datos
