@@ -165,8 +165,35 @@ def comprimir_pdf(pdf,
     
 # %% Recorrer la base de datos
 for i in range(0, len(dfbase)):
+    # Reiniciar robot cada 50 iteraciones
+    if i%10 == 0 and i > 0:
+        # Cerrar sesion
+        r.click('//*[@id="CUSTOMMENU_MPAGE"]/ul/li/a/span') # Menú Usuario
+        r.click('//*[@id="salir"]') # Botón Salir
+
+        # Cerrar robot
+        print('Cerrar robot', variables['robot'])
+        r.close()
+
+        # Iniciar robot
+        print('Iniciar robot', variables['robot'])
+        r.init(visual_automation = False, turbo_mode=False, headless_mode=True)
+
+        # Iniciar sesion
+        # Función para iniciar sesión en Laboratorio
+        # Arbrir INICIAR SESION
+        r.url('https://infolab.subrednorte.gov.co/REDNORTE/login.aspx')
+
+        # Iniciar sesion
+        esperar(r, variables, '//*[@id="SECTION4"]/input', 'Botón Iniciar Sesión')
+        r.type('//*[@id="vUSUARIOLOGIN"]', '[clear]' + variables['user']) # Celda 'Usuario'
+        r.type('//*[@id="vUSUARIOPASSWORD"]', '[clear]' + variables['password']) # Celda 'Contraseña'
+        r.select('//*[@id="vUSUARIOLABORATORIO"]', 'BUENAVISTA') # Lista despelgable 'Seleccionar laboratorio'
+        r.click('//*[@id="SECTION4"]/input') # Botón 'Iniciar Sesión'
+
+
     # Variables
-    #i=0
+    #i=50
     proceso = dfbase.loc[i, 'Var5 Tipo de Identificación del usuario'] + dfbase.loc[i, 'Var6 Número de Identificación del usuario']
 
     # Iniciar consulta
@@ -278,7 +305,7 @@ for i in range(0, len(dfbase)):
     mensaje(variables, 'Terminada Descarga de Laboratorios ' + str(n-1) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin)
     mensaje(variables, 'Descarga de Laboratorios ' + str(n-1) + ' --- proceso '+proceso+' - inicio: '+horainicio+' - fin: '+horafin, variables['repositorio'])
     # Actualizar archivo
-    dfbase.loc[i, 'Estado'] = 'Descargadas ' + str(n)
+    dfbase.loc[i, 'Estado'] = 'Descargadas ' + str(n-1)
     dfbase.to_excel(variables['base'], index=False)
 
 
