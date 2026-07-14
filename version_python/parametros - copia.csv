@@ -1,0 +1,15 @@
+parametro,valor,descripción
+repositorio,C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\,ubicación del repositorio de documentos
+espera,30,segundos a esperar como máximo en cada busqueda de un objeto
+usuario,robot1,nombre del usuario en windows desde el que se está ejecutando el robot
+user,CONTRATACION.OPS.ROBOT,nombre del usuario de SECOP II
+password,Cambiar123*,contraseña del usuario de SECOP II
+user4,RESPONSABLE.OPS.JUAN.PABLO,nombre del usuario de SECOP II
+password4,Cambiar123*,contraseña del usuario de SECOP II
+user3,CONTRATACION.CRISTHIAN.MARTINEZ,nombre del usuario de SECOP II
+password3,Norte2024*,contraseña del usuario de SECOP II
+user2,DIR.CONTRATACION.TATIANA,nombre del usuario de SECOP II
+password2,Tatiana2025//,contraseña del usuario de SECOP II
+user1,Gerencia.Victoria,nombre del usuario de SECOP II
+password1,Victoria.Eugenia30//,contraseña del usuario de SECOP II
+base,base_de_datos_Contratacion.xlsx,nombre del archivo de base de datos sin extensión .xlsx

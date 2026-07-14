@@ -1,0 +1,4 @@
+parametro,valor,descripción
+repositorio,C:\\Mis Documentos\\trabajos\\contratacion\\robots\\RPA-TagUI-SECOPII\\version_python\\,ubicación del repositorio de documentos
+usuario,robot1,nombre del usuario en windows desde el que se está ejecutando el robot
+base,Descarga.xlsx,nombre del archivo de base de datos sin extensión .xlsx
