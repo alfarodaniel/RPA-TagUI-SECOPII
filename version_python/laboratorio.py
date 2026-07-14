@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 """
-Descargar Laboratorios
+Descargar Laboratorios 
 Descargar Laboratorios las Historias listadas en el archivo "Base_descargas_HC.xlsx"
 """
 
