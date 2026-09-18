@@ -37,9 +37,9 @@ def _encode_filter(raw: str) -> str:
     return quote(raw, safe=":")
 
 
-def build_first_url(reporte: str, filter_expr: str | None, top: int) -> str:
+def build_first_url(report: str, filter_expr: str | None, top: int) -> str:
     """URL inicial con $filter, $top y $skip=0 explicito (como usa el navegador)."""
-    seg = f"{reporte}"
+    seg = f"{report}"
     parts = [f"{BASE_URL}/{seg}"]
     qs: list[str] = []
     if filter_expr:
@@ -136,7 +136,7 @@ def load_reference_csv(path: str) -> set[str]:
 # ---------------------------------------------------------------------------
 
 def download_direct(
-    reporte: str,
+    report: str,
     filter_expr: str | None,
     output: str,
     top: int,
@@ -153,7 +153,7 @@ def download_direct(
         "Accept": "application/json",
     })
 
-    url = build_first_url(reporte, filter_expr, top)
+    url = build_first_url(report, filter_expr, top)
     all_keys: list[str] = []
     total = 0
     batch = 0
@@ -170,8 +170,7 @@ def download_direct(
         while url:
             batch += 1
             if verbose:
-                snippet = url[:110]
-                print(f"\n[ ESP ] Bloque {batch} - {snippet}...")
+                print(f"\n[ESP] Bloque {batch} - {url}")
 
             page = fetch_page(url, session)
             records = page.get("value", [])
@@ -218,7 +217,7 @@ def download_direct(
 # ---------------------------------------------------------------------------
 
 def download_and_cross(
-    reporte: str,
+    report: str,
     filter_expr: str | None,
     output: str,
     top: int,
@@ -250,7 +249,7 @@ def download_and_cross(
         "Accept": "application/json",
     })
 
-    url = build_first_url(reporte, filter_expr, top)
+    url = build_first_url(report, filter_expr, top)
     all_keys: list[str] = []
     total = 0         # registros descargados (todos, sin filtrar)
     matched = 0       # registros que pasaron el cruce y se escribieron
@@ -270,8 +269,7 @@ def download_and_cross(
         while url:
             batch += 1
             if verbose:
-                snippet = url[:110]
-                print(f"\n[ ESP ] Bloque {batch} - {snippet}...")
+                print(f"\n[ESP] Bloque {batch} - {url}")
 
             page = fetch_page(url, session)
             records = page.get("value", [])
@@ -286,7 +284,7 @@ def download_and_cross(
                 all_keys = list(records[0].keys())
                 if "id_contrato" not in all_keys:
                     raise RuntimeError(
-                        f"El reporte '{reporte}' no tiene la columna 'id_contrato'. "
+                        f"El reporte '{report}' no tiene la columna 'id_contrato'. "
                         f"Columnas: {all_keys}. No se puede realizar el cruce."
                     )
                 writer = csv.DictWriter(fh, fieldnames=all_keys)
@@ -324,7 +322,7 @@ def download_and_cross(
             print(f"\n[OK] Cruce: {matched:,} de {total:,} registros coinciden con id_contrato")
         print("\n" + "=" * 60)
         print(f"[OK]  Descarga + cruce completado (streaming).")
-        print(f"    Reporte:                                    {reporte}")
+        print(f"    Reporte:                                    {report}")
         print(f"    Registros descargados (total, sin filtrar): {total:,}")
         print(f"    Valores en referencia (id_contrato):          {len(ref_set):,}")
         print(f"    Registros despues del cruce (escritos):     {matched:,}")
@@ -351,32 +349,32 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 REGLAS DE REPORTE
-  --reporte "jbjy-vk9h"
-      -> Descarga directa a ContratosElectronicos.csv (bloques de 20000).
+  --report "jbjy-vk9h"
+      -> Descarga directa (bloques de 20000).
       -> Es el modo que descarga TODO y lo guarda tal cual.
 
-  --reporte "dmgg-8hin"
+  --report "dmgg-8hin"
       -> Descarga directa SIN CRUCE (bloques de 20000).
       -> Descarga todos los registros del reporte sin cruzar con
         ContratosElectronicos.csv.
-      -> Ejemplo:
-        python descargador_odata.py \\
-            --reporte "dmgg-8hin" \\
-            --filter "nit_entidad eq 900971006 and fecha_carga ge '2026-01-01T00:00:00' and fecha_carga le '2026-01-31T23:59:59'" \\
-            --output "ArchivosDescargadosDesde2025202601"
 
-  --reporte <cualquier otro>
+  --report "u8cx-r425"
+      -> Descarga directa SIN CRUCE (bloques de 20000).
+      -> Descarga todos los registros del reporte sin cruzar con
+        ContratosElectronicos.csv.
+
+  --report <cualquier otro>
       -> Streaming + cruce por id_contrato / id_contrato.
       -> Ejemplo:
         python descargador_odata.py \\
-            --reporte "cb9c-h8sn" \\
+            --report "cb9c-h8sn" \\
             --filter "fecharegistro ge '2026-01-01T00:00:00' and fecharegistro le '2026-01-31T23:59:59'" \\
             --output "Adiciones202601.csv" \\
             --top 5000
 
 NOTA IMPORTANTE
   El Caso B requiere que ContratosElectronicos.csv EXISTE. Ejecuta primero:
-    python descargador_odata.py --reporte jbjy-vk9h --filter "nit_entidad eq 900971006"
+    python descargador_odata.py --report jbjy-vk9h --filter "nit_entidad eq 900971006"
 
   IMPORTANTE: CODIFICACION DE URL
     El servidor OData de Datos.gov.co rechaza urllib.parse.urlencode porque
@@ -384,17 +382,17 @@ NOTA IMPORTANTE
     urllib.parse.quote(filter_raw, safe=":") que deja ':' intacto y usa %20
     para espacios, igual que en la barra del navegador.
 
-        """,
+    """,
     )
 
-    p.add_argument("--reporte", "-r", required=True,
-                   help="Identificador del dataset OData (ej. jbjy-vk9h, cb9c-h8sn, dmgg-8hin)")
+    p.add_argument("--report", "-r", required=True,
+                   help="Identificador del dataset OData (ej. jbjy-vk9h, cb9c-h8sn, dmgg-8hin, u8cx-r425)")
     p.add_argument("--filter", "-f", default=None,
                    help="Filtro OData opcional (ej. 'nit_entidad eq 900971006')")
     p.add_argument("--top", "-t", type=int, default=DEFAULT_TOP,
                    help=f"Registros por peticion (default: {DEFAULT_TOP})")
-    p.add_argument("--output", "-o", default=None,
-                   help="Archivo de salida (default automatico segun reporte)")
+    p.add_argument("--output", "-o", required=True,
+                   help="Archivo de salida (OBLIGATORIO)")
     p.add_argument("--contratos-path", default=CONTRATOS_DEFAULT,
                    help=f"Ruta al CSV maestro ContratosElectronicos.csv "
                         f"(default: {CONTRATOS_DEFAULT})")
@@ -408,39 +406,18 @@ NOTA IMPORTANTE
     return p.parse_args()
 
 
-def default_output(reporte: str, is_direct: bool) -> str:
-    """Nombre de salida por defecto segun reglas."""
-    if is_direct:
-        # Caso A: jbjy-vk9h -> ContratosElectronicos.csv, dmgg-8hin -> dmgg-8hin.csv
-        if reporte == "jbjy-vk9h":
-            return CONTRATOS_DEFAULT
-        if reporte == "dmgg-8hin":
-            return "dmgg-8hin.csv"
-        # otro reporte directo (si se agrega en el futuro) -> <reporte>.csv
-        return f"{reporte}.csv"
-    # Caso B: <reporte>_cruce.csv  (si no se paso --output)
-    base = reporte.replace("/", "_").replace("\\", "_")
-    return f"{base}_cruce.csv"
-
-
 def main() -> None:
     args = parse_args()
     delay = 0.0 if args.no_delay else args.delay
     verbose = not args.quiet
-    is_direct = (args.reporte in ("jbjy-vk9h", "dmgg-8hin"))
+    is_direct = (args.report in ("jbjy-vk9h", "dmgg-8hin", "u8cx-r425"))
 
-    # Determinar output
-    output = args.output or default_output(args.reporte, is_direct)
+    output = args.output  # OBLIGATORIO, no hay default
 
     if is_direct:
-        # Descarga directa sin cruce (jbjy-vk9h o dmgg-8hin)
-        if args.reporte == "jbjy-vk9h" and args.output:
-            if verbose:
-                print(f"[INFO] jbjy-vk9h pero --output={args.output}. "
-                      f"Se escribe aqui en lugar de {CONTRATOS_DEFAULT}.")
         try:
             total = download_direct(
-                reporte=args.reporte,
+                report=args.report,
                 filter_expr=args.filter,
                 output=output,
                 top=args.top,
@@ -461,13 +438,13 @@ def main() -> None:
         if not os.path.isfile(args.contratos_path):
             print(f"\n[ERROR] ERROR: no existe '{args.contratos_path}'. "
                   f"Ejecute primero: python descargador_odata.py "
-                  f"--reporte jbjy-vk9h --filter 'nit_entidad eq 900971006'",
+                  f"--report jbjy-vk9h --filter 'nit_entidad eq 900971006'",
                   file=sys.stderr)
             sys.exit(4)
 
         try:
             total = download_and_cross(
-                reporte=args.reporte,
+                report=args.report,
                 filter_expr=args.filter,
                 output=output,
                 top=args.top,
