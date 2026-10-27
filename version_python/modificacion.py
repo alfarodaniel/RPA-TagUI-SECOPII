@@ -19,7 +19,7 @@ redirigir_log()
 
 # Establecer variables de configuración
 variables = parametros()
-variables['robot'] = 'modificación_v4'
+variables['robot'] = 'modificación_v5'
 
 # Cargar base de datos de contratación "base_de_datos_Contratacion.xlsx" en solo texto
 dfbase = read_excel(variables['base'], dtype=str)
@@ -56,7 +56,7 @@ for i in range(0, len(dfbase)):
     r.click('//*[@id="lnk_stpmStepManager9"]') # Menú 8 Modificacione del Contrato
     if not esperar(r, variables, '//*[@id="btnMakeModification"]', 'Botón Modificar'): continue
     # Validar si el contrato está en edición
-    if r.read('//*[@id="spnModificationStatusValue_0"]') == 'InEdition':
+    if r.read('//*[@id="spnModificationStatusValue_0"]') == 'InEdition' or r.read('//*[@id="spnModificationStatusValue_0"]') == 'En edición':
         r.click('//*[@id="lnkEditLink_0"]') # Enlace Editar
     else:
         r.click('//*[@id="btnMakeModification"]') # Botón Modificar
