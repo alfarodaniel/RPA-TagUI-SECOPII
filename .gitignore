@@ -1,2 +1,6 @@
 *.exe
 *.txt
+*.spec
+.venv/
+version_python/build/
+version_python/dist/
