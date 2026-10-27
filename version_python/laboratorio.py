@@ -232,6 +232,7 @@ for i in range(0, len(dfbase)):
     # Paso 1: Descargar Folios
     # OJO configurar Chrome para descargar PDF en vez de abrir en el navegador con 
     #  chrome://settings/content/pdfDocuments
+    # También habilitar el popup de descarga
     print('Paso 1: Descargar Folios --- proceso', proceso)
     
     # Crear carpeta
